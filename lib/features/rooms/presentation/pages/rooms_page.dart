@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:malaz/core/di/providers.dart';
+import 'package:malaz/core/theme/app_colors.dart';
+import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
 
 class RoomsPage extends StatelessWidget {
   const RoomsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Rooms'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              getIt<AuthCubit>().signOut();
+            },
+          ),
+        ],
+      ),
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              colorScheme.surface,
-              const Color(0xFFF2E5D8),
-              const Color(0xFFF7F1EA),
+              AppColors.surfaceColor,
+              AppColors.surfaceColor.withValues(alpha: 0.8),
+              AppColors.surfaceColor.withValues(alpha: 0.6),
+              AppColors.surfaceColor.withValues(alpha: 0.4),
+              AppColors.surfaceColor.withValues(alpha: 0.2),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -24,7 +38,7 @@ class RoomsPage extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
-              _HeroCard(colorScheme: colorScheme),
+              _HeroCard(),
               const SizedBox(height: 20),
               Text(
                 'Architecture scaffold',
@@ -57,9 +71,7 @@ class RoomsPage extends StatelessWidget {
 }
 
 class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.colorScheme});
-
-  final ColorScheme colorScheme;
+  const _HeroCard();
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +79,7 @@ class _HeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(28),
-        color: colorScheme.primary,
+        color: AppColors.primaryColor,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +87,7 @@ class _HeroCard extends StatelessWidget {
           Text(
             'Malaz architecture',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: colorScheme.onPrimary,
+              color: AppColors.onPrimaryColor,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -83,7 +95,7 @@ class _HeroCard extends StatelessWidget {
           Text(
             'This app currently exposes only the clean folder structure so feature logic can be added intentionally later.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: colorScheme.onPrimary.withValues(alpha: 0.9),
+              color: AppColors.onPrimaryColor.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -103,7 +115,7 @@ class _StructureCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
           BoxShadow(

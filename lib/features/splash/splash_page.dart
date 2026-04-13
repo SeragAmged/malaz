@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:malaz/core/router/app_router.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -31,7 +33,7 @@ class _SplashPageState extends State<SplashPage>
   Future<void> _navigateToHome() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed('/rooms');
+      //  context.go(AppRouter.rooms);
     }
   }
 
@@ -76,8 +78,9 @@ class _SplashPageState extends State<SplashPage>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF66d9cc)
-                                  .withValues(alpha: 0.2),
+                              color: const Color(
+                                0xFF66d9cc,
+                              ).withValues(alpha: 0.2),
                               blurRadius: 32,
                               spreadRadius: 16,
                             ),
@@ -91,16 +94,19 @@ class _SplashPageState extends State<SplashPage>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFF66d9cc)
-                                .withValues(alpha: 0.2),
+                            color: const Color(
+                              0xFF66d9cc,
+                            ).withValues(alpha: 0.2),
                             width: 1.5,
                           ),
                         ),
                       ),
                       // Inner animated core
                       ScaleTransition(
-                        scale: Tween<double>(begin: 0.8, end: 1.0)
-                            .animate(_animationController),
+                        scale: Tween<double>(
+                          begin: 0.8,
+                          end: 1.0,
+                        ).animate(_animationController),
                         child: Transform.rotate(
                           angle: 0.785, // 45 degrees
                           child: Container(
@@ -111,15 +117,13 @@ class _SplashPageState extends State<SplashPage>
                               gradient: const LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF66d9cc),
-                                  Color(0xFF008177),
-                                ],
+                                colors: [Color(0xFF66d9cc), Color(0xFF008177)],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF66d9cc)
-                                      .withValues(alpha: 0.3),
+                                  color: const Color(
+                                    0xFF66d9cc,
+                                  ).withValues(alpha: 0.3),
                                   blurRadius: 40,
                                   spreadRadius: 0,
                                 ),
@@ -159,13 +163,12 @@ class _SplashPageState extends State<SplashPage>
                         top: 16,
                         right: 16,
                         child: ScaleTransition(
-                          scale: Tween<double>(begin: 0.0, end: 1.0)
-                              .animate(
-                                CurvedAnimation(
-                                  parent: _animationController,
-                                  curve: const Interval(0.3, 0.8),
-                                ),
-                              ),
+                          scale: Tween<double>(begin: 0.0, end: 1.0).animate(
+                            CurvedAnimation(
+                              parent: _animationController,
+                              curve: const Interval(0.3, 0.8),
+                            ),
+                          ),
                           child: Container(
                             width: 12,
                             height: 12,
@@ -181,13 +184,12 @@ class _SplashPageState extends State<SplashPage>
                         bottom: 32,
                         left: 0,
                         child: ScaleTransition(
-                          scale: Tween<double>(begin: 0.0, end: 1.0)
-                              .animate(
-                                CurvedAnimation(
-                                  parent: _animationController,
-                                  curve: const Interval(0.5, 1.0),
-                                ),
-                              ),
+                          scale: Tween<double>(begin: 0.0, end: 1.0).animate(
+                            CurvedAnimation(
+                              parent: _animationController,
+                              curve: const Interval(0.5, 1.0),
+                            ),
+                          ),
                           child: Container(
                             width: 8,
                             height: 8,
@@ -218,18 +220,17 @@ class _SplashPageState extends State<SplashPage>
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.displaySmall
                             ?.copyWith(
-                          color: const Color(0xFFdfe3e2),
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -1.8,
-                        ),
+                              color: const Color(0xFFdfe3e2),
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -1.8,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       // Subheading
                       Text(
                         'THE FLOW STATE SANCTUARY',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelSmall
-                            ?.copyWith(
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: const Color(0xFFbdc9c8),
                           fontWeight: FontWeight.w600,
                           letterSpacing: 2.4,

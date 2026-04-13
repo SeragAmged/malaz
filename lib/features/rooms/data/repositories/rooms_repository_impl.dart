@@ -1,5 +1,5 @@
-import '../../../../core/errors/domain_errors.dart';
-import '../../../../core/result.dart';
+import '../../../../core/util/errors/domain_errors.dart';
+import '../../../../core/util/result.dart';
 import '../../domain/entities/room.dart';
 import '../../domain/repositories/rooms_repository.dart';
 import '../datasources/rooms_local_datasource.dart';
