@@ -1,142 +1,167 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/di/providers.dart';
 import 'package:malaz/core/theme/app_colors.dart';
-import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:malaz/core/theme/app_text_styles.dart';
+import 'package:malaz/core/widgets/blurred_circle_decoration.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
+import 'package:malaz/features/rooms/presentation/widgets/create_room_modal.dart';
+import 'package:malaz/features/rooms/presentation/widgets/header.dart';
+import 'package:malaz/features/rooms/presentation/widgets/room_card.dart';
 
 class RoomsPage extends StatelessWidget {
   const RoomsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider<RoomsCubit>(
+      create: (context) => getIt<RoomsCubit>()..fetchRooms(),
+      child: const _RoomsView(),
+    );
+  }
+}
+
+class _RoomsView extends StatefulWidget {
+  const _RoomsView();
+
+  @override
+  State<_RoomsView> createState() => _RoomsViewState();
+}
+
+class _RoomsViewState extends State<_RoomsView> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      context.read<RoomsCubit>().loadMoreRooms();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Rooms'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              getIt<AuthCubit>().signOut();
-            },
-          ),
-        ],
+        title: Text('M A L A Z', style: AppTextStyles.appBarTitle),
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.logout_rounded),
+        //     onPressed: () => context.read<AuthCubit>().signOut(),
+        //   ),
+        // ],
       ),
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.surfaceColor,
-              AppColors.surfaceColor.withValues(alpha: 0.8),
-              AppColors.surfaceColor.withValues(alpha: 0.6),
-              AppColors.surfaceColor.withValues(alpha: 0.4),
-              AppColors.surfaceColor.withValues(alpha: 0.2),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              _HeroCard(),
-              const SizedBox(height: 20),
-              Text(
-                'Architecture scaffold',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 12),
-              const _StructureCard(
-                title: 'data/',
-                body:
-                    'datasources/, models/, mappers/, and repositories/ are present as placeholders.',
-              ),
-              const SizedBox(height: 12),
-              const _StructureCard(
-                title: 'domain/',
-                body:
-                    'entities/ and repositories/ define feature boundaries without behavior yet.',
-              ),
-              const SizedBox(height: 12),
-              const _StructureCard(
-                title: 'presentation/',
-                body:
-                    'cubit/ and pages/ are scaffolded so the feature can be wired in later.',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HeroCard extends StatelessWidget {
-  const _HeroCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: AppColors.primaryColor,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
         children: [
-          Text(
-            'Malaz architecture',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: AppColors.onPrimaryColor,
-              fontWeight: FontWeight.w700,
-            ),
+          // Teal radial glow – top right, matches the screenshot
+          BlurredCircleDecoration(
+            width: 234.w,
+            height: 641.h,
+            color: AppColors.primaryColor,
+            colorAlpha: 0.15,
+            right: -120.w,
+            top: -250.h,
           ),
-          const SizedBox(height: 12),
-          Text(
-            'This app currently exposes only the clean folder structure so feature logic can be added intentionally later.',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppColors.onPrimaryColor.withValues(alpha: 0.9),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Header(),
+                Expanded(
+                  child: BlocBuilder<RoomsCubit, RoomsState>(
+                    builder: (context, state) {
+                      if (state.isLoading || state.isInitial) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        );
+                      }
+                      if (state.isFailure) {
+                        return Center(
+                          child: Text(
+                            state.errorMessage ?? 'Something went wrong.',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.errorColor,
+                            ),
+                          ),
+                        );
+                      }
+                      if (state.rooms.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No rooms available.',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textTertiaryColor,
+                            ),
+                          ),
+                        );
+                      }
+                      final itemCount =
+                          state.rooms.length + (state.isLoadingMore ? 1 : 0);
+                      return ListView.separated(
+                        controller: _scrollController,
+                        padding: EdgeInsets.fromLTRB(16.w, 40.h, 16.w, 100.h),
+                        itemCount: itemCount,
+                        separatorBuilder: (_, _) => SizedBox(height: 10.h),
+                        itemBuilder: (context, index) {
+                          if (index == state.rooms.length) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.h),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            );
+                          }
+                          return RoomCard(room: state.rooms[index]);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _StructureCard extends StatelessWidget {
-  const _StructureCard({required this.title, required this.body});
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceColor,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 24,
-            offset: Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 6),
-          Text(body),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (_) => BlocProvider.value(
+              value: context.read<RoomsCubit>(),
+              child: const CreateRoomModal(),
+            ),
+          );
+        },
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.onPrimaryColor,
+        elevation: 6,
+        child: Icon(Icons.add, size: 28.r),
       ),
     );
   }
