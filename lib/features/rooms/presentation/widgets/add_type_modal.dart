@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
+import 'package:malaz/core/util/validators.dart';
 
 class AddTypeModal extends StatefulWidget {
   const AddTypeModal({super.key});
@@ -29,7 +30,9 @@ class _AddTypeModalState extends State<AddTypeModal> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerColor,
@@ -76,9 +79,7 @@ class _AddTypeModalState extends State<AddTypeModal> {
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _submit(),
                 validator: (value) =>
-                    (value == null || value.trim().isEmpty)
-                        ? 'Type name is required'
-                        : null,
+                    Validators.validateEmpty(value, "Type name is required"),
                 decoration: const InputDecoration(hintText: 'e.g. Drawing 🎨'),
               ),
               SizedBox(height: 32.h),

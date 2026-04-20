@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
-import 'package:malaz/features/auth/presentation/validators.dart';
+import 'package:malaz/core/util/validators.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/auth_branding.dart';
-import '../widgets/auth_loading_button.dart';
+import '../../../../core/widgets/app_loading_button.dart';
 import '../widgets/auth_navigation_link.dart';
-import '../widgets/auth_text_field.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../widgets/avatar_selector.dart';
-import '../widgets/blurred_circle_decoration.dart';
+import '../../../../core/widgets/blurred_circle_decoration.dart';
 import '../widgets/confirmation_view.dart';
 import '../widgets/form_container.dart';
 
@@ -100,6 +100,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 height: 300.h,
                 bottom: -200.h,
                 right: -80.w,
+                colorAlpha: 0.1,
               ),
               SafeArea(
                 child: Center(
@@ -123,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 SizedBox(height: 40.h),
                                 FormContainer(
                                   children: [
-                                    AuthTextField(
+                                    AppTextField(
                                       label: 'EMAIL ADDRESS',
                                       hintText: 'name@flowstate.com',
                                       controller: _emailController,
@@ -132,7 +133,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       validator: Validators.validateEmail,
                                     ),
                                     SizedBox(height: 20.h),
-                                    AuthTextField(
+                                    AppTextField(
                                       label: 'CREATE PASSWORD',
                                       hintText: '••••••••',
                                       controller: _passwordController,
@@ -141,7 +142,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       validator: Validators.passwordValidator,
                                     ),
                                     SizedBox(height: 20.h),
-                                    AuthTextField(
+                                    AppTextField(
                                       label: 'CONFIRM PASSWORD',
                                       hintText: '••••••••',
                                       controller: _confirmPasswordController,
@@ -154,7 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                           ),
                                     ),
                                     SizedBox(height: 20.h),
-                                    AuthTextField(
+                                    AppTextField(
                                       label: 'DISPLAY NAME',
                                       hintText: 'How should we call you?',
                                       controller: _displayNameController,
@@ -188,7 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     SizedBox(height: 32.h),
                                     BlocBuilder<AuthCubit, AuthState>(
                                       builder: (context, state) {
-                                        return AuthLoadingButton(
+                                        return AppLoadingButton(
                                           label: 'SIGN UP',
                                           onPressed: _handleSignUp,
                                           isLoading: state.isLoading,

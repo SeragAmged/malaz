@@ -1,46 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:malaz/core/router/app_router.dart';
+import 'package:malaz/core/theme/app_colors.dart';
 
 class LayoutPage extends StatelessWidget {
   final Widget child;
+  final int currentIndex;
+  final void Function(int) onTap;
+  const LayoutPage({
+    super.key,
+    required this.child,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
-  const LayoutPage({super.key, required this.child});
-
-  int _getIndex(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
-
-    if (location.startsWith('/home')) return 0;
-    if (location.startsWith('/search')) return 1;
-    if (location.startsWith('/profile')) return 2;
-
-    return 0;
-  }
+  // void _onItemTapped(BuildContext context, int index) {
+  //   switch (index) {
+  //     case 0:
+  //       context.go(AppRouter.rooms);
+  //       break;
+  //     case 1:
+  //       context.go(AppRouter.stats);
+  //       break;
+  //     case 2:
+  //       context.go(AppRouter.profile);
+  //       break;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final index = _getIndex(context);
-
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: index,
-        onTap: (i) {
-          switch (i) {
-            case 0:
-              context.go('/home');
-              break;
-            case 1:
-              context.go('/search');
-              break;
-            case 2:
-              context.go('/profile');
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: currentIndex,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        onDestinationSelected: onTap,
+        indicatorColor: AppColors.primaryColor.withAlpha(255 ~/ 10),
+        destinations: [
+          NavigationDestination(
+            icon: Icon(Icons.home_max),
+            selectedIcon: Icon(Icons.home_max, color: AppColors.primaryColor),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_rounded),
+            selectedIcon: Icon(
+              Icons.bar_chart_rounded,
+              color: AppColors.primaryColor,
+            ),
+            label: 'Statistics',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person),
+            selectedIcon: Icon(Icons.person, color: AppColors.primaryColor),
+            label: 'Profile',
+          ),
         ],
       ),
     );

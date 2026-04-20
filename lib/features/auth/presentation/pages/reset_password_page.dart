@@ -4,14 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
-import 'package:malaz/features/auth/presentation/validators.dart';
-import 'package:malaz/features/auth/presentation/widgets/auth_loading_button.dart';
-import 'package:malaz/features/auth/presentation/widgets/blurred_circle_decoration.dart';
+import 'package:malaz/core/util/validators.dart';
+import 'package:malaz/core/widgets/app_loading_button.dart';
+import 'package:malaz/core/widgets/blurred_circle_decoration.dart';
 
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/auth_header.dart';
-import '../widgets/auth_text_field.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../widgets/info_box.dart';
 import '../widgets/read_only_field.dart';
 
@@ -107,7 +107,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                   icon: Icons.email_outlined,
                                 ),
                                 SizedBox(height: 20.h),
-                                AuthTextField(
+                                AppTextField(
                                   label: 'New Password',
                                   hintText: 'Enter new password',
                                   controller: _passwordController,
@@ -118,7 +118,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                   validator: Validators.passwordValidator,
                                 ),
                                 SizedBox(height: 20.h),
-                                AuthTextField(
+                                AppTextField(
                                   label: 'Confirm Password',
                                   hintText: 'Enter new password',
                                   controller: _confirmController,
@@ -144,7 +144,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 ),
                                 SizedBox(height: 24.h),
 
-                                AuthLoadingButton(
+                                AppLoadingButton(
                                   label: "Reset Password",
                                   onPressed: _onReset,
                                   isLoading: state.uiState == UiState.loading,

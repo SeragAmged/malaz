@@ -18,7 +18,7 @@ class RoomsState {
     this.leaveRoomStatus = UiStatus.initial,
     this.leaveRoomError,
     this.joinStatus = UiStatus.initial,
-    this.joinError,
+    this.joinError, this.joinedRoomId,
   });
 
   final UiStatus status;
@@ -34,6 +34,7 @@ class RoomsState {
   final DomainError? leaveRoomError;
   final UiStatus joinStatus;
   final DomainError? joinError;
+  final String? joinedRoomId;
 
   bool get isInitial => status == UiStatus.initial;
   bool get isLoading => status == UiStatus.loading;
@@ -68,6 +69,7 @@ class RoomsState {
     bool clearCreateError = false,
     bool clearLeaveRoomError = false,
     bool clearJoinError = false,
+    String? joinedRoomId,
   }) {
     return RoomsState(
       newRoomId: newRoomId ?? this.newRoomId,
@@ -83,6 +85,7 @@ class RoomsState {
       leaveRoomStatus: leaveRoomStatus ?? this.leaveRoomStatus,
       joinStatus: joinStatus ?? this.joinStatus,
       joinError: clearJoinError ? null : (joinError ?? this.joinError),
+      joinedRoomId: joinedRoomId ?? this.joinedRoomId,
     );
   }
 }

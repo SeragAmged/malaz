@@ -55,25 +55,10 @@ class _JoinRoomModalState extends State<JoinRoomModal> {
     return BlocListener<RoomsCubit, RoomsState>(
       listener: (context, state) {
         if (state.isJoinSuccess) {
-          context.read<RoomsCubit>().resetJoinStatus();
           Navigator.of(context).pop();
-          context.go('${AppRouter.rooms}/${widget.roomId}');
         }
 
-        if (state.isJoinFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.joinError?.message ?? 'Failed to join room.',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.onErrorColor,
-                ),
-              ),
-              backgroundColor: AppColors.errorColor,
-            ),
-          );
-          context.read<RoomsCubit>().resetJoinStatus();
-        }
+  
       },
       child: BlocBuilder<RoomsCubit, RoomsState>(
         builder: (context, state) {

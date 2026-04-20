@@ -43,8 +43,10 @@ class BlurredCircleDecoration extends StatelessWidget {
         child: Container(
           width: width,
           height: height,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
+          decoration: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(999),
+            ),
             color: (color ?? AppColors.primaryColor).withValues(
               alpha: colorAlpha,
             ),

@@ -5,14 +5,15 @@ import 'package:go_router/go_router.dart';
 import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
-import 'package:malaz/features/auth/presentation/validators.dart';
+import 'package:malaz/core/util/validators.dart';
+import 'package:malaz/features/splash/splash_page.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/auth_branding.dart';
-import '../widgets/auth_loading_button.dart';
+import '../../../../core/widgets/app_loading_button.dart';
 import '../widgets/auth_navigation_link.dart';
-import '../widgets/auth_text_field.dart';
-import '../widgets/blurred_circle_decoration.dart';
+import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/blurred_circle_decoration.dart';
 import '../widgets/form_container.dart';
 
 /// Login page
@@ -34,7 +35,6 @@ class _SignInPageState extends State<SignInPage> {
     _passwordController.dispose();
     super.dispose();
   }
-
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
@@ -91,57 +91,57 @@ class _SignInPageState extends State<SignInPage> {
                         SizedBox(height: 40.h),
                         FormContainer(
                           children: [
-                              AuthTextField(
-                                label: 'EMAIL ADDRESS',
-                                hintText: 'name@flowstate.com',
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                prefixIcon: Icons.email_outlined,
-                                validator: Validators.validateEmail,
-                              ),
-                              SizedBox(height: 20.h),
+                            AppTextField(
+                              label: 'EMAIL ADDRESS',
+                              hintText: 'name@flowstate.com',
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              prefixIcon: Icons.email_outlined,
+                              validator: Validators.validateEmail,
+                            ),
+                            SizedBox(height: 20.h),
 
-                              AuthTextField(
-                                label: 'PASSWORD',
-                                hintText: '••••••••',
-                                controller: _passwordController,
-                                obscureText: true,
-                                prefixIcon: Icons.lock_outline,
-                                validator: Validators.passwordValidator,
-                              ),
-                              SizedBox(height: 24.h),
+                            AppTextField(
+                              label: 'PASSWORD',
+                              hintText: '••••••••',
+                              controller: _passwordController,
+                              obscureText: true,
+                              prefixIcon: Icons.lock_outline,
+                              validator: Validators.passwordValidator,
+                            ),
+                            SizedBox(height: 24.h),
 
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () =>
-                                      context.push(AppRouter.forgotPassword),
-                                  child: Text(
-                                    'Forgot password?',
-                                    style: AppTextStyles.titleSmall.copyWith(
-                                      color: AppColors.primaryColor,
-                                    ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () =>
+                                    context.push(AppRouter.forgotPassword),
+                                child: Text(
+                                  'Forgot password?',
+                                  style: AppTextStyles.titleSmall.copyWith(
+                                    color: AppColors.primaryColor,
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 24.h),
-                              BlocBuilder<AuthCubit, AuthState>(
-                                builder: (context, state) {
-                                  return AuthLoadingButton(
-                                    label: 'LOGIN',
-                                    onPressed: _handleLogin,
-                                    isLoading: state.isLoading,
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 24.h),
-                              AuthNavigationLink(
-                                labelText: "Don't have an account? ",
-                                linkText: 'Sign Up',
-                                onLinkPressed: () =>
-                                    context.push(AppRouter.signUp),
-                              ),
-                            ],
+                            ),
+                            SizedBox(height: 24.h),
+                            BlocBuilder<AuthCubit, AuthState>(
+                              builder: (context, state) {
+                                return AppLoadingButton(
+                                  label: 'LOGIN',
+                                  onPressed: _handleLogin,
+                                  isLoading: state.isLoading,
+                                );
+                              },
+                            ),
+                            SizedBox(height: 24.h),
+                            AuthNavigationLink(
+                              labelText: "Don't have an account? ",
+                              linkText: 'Sign Up',
+                              onLinkPressed: () =>
+                                  context.push(AppRouter.signUp),
+                            ),
+                          ],
                         ),
                       ],
                     ),

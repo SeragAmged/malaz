@@ -1,11 +1,22 @@
+import 'dart:developer';
+import 'dart:math' show Random;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
+import 'package:malaz/core/util/errors/domain_errors.dart';
+import 'package:malaz/core/util/validators.dart';
+import 'package:malaz/core/widgets/app_loading_button.dart';
+import 'package:malaz/core/widgets/app_text_field.dart';
 import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
 import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
 import 'package:malaz/features/rooms/presentation/widgets/add_type_modal.dart';
+import 'package:malaz/features/rooms/presentation/widgets/leave_room_dialog.dart';
+import 'package:malaz/features/rooms/presentation/widgets/room_type_chip.dart';
 
 class CreateRoomModal extends StatefulWidget {
   const CreateRoomModal({super.key});
@@ -23,7 +34,8 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
   String? _selectedType;
   String _selectedColor = '#4A90D9';
   bool _isPrivate = false;
-  bool _obscurePassword = true;
+  final bool _obscurePassword = true;
+  BuildContext? _leaveDialogContext;
 
   static const List<String> _colors = [
     '#4A90D9',
@@ -33,6 +45,12 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
     '#E74C3C',
     '#66D9CC',
   ];
+
+  @override
+  void initState() {
+    _selectedType = _types.first;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -65,8 +83,7 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
     }
   }
 
-  void _submit(bool isCreating) {
-    if (isCreating) return;
+  void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<RoomsCubit>().createRoom(
       name: _nameController.text.trim(),
@@ -80,26 +97,51 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<RoomsCubit, RoomsState>(
-      listener: (context, state) {
-        if (state.createStatus == CreateRoomStatus.createSuccess) {
-          Navigator.pop(context);
-        } else if (state.createStatus == CreateRoomStatus.createFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.createErrorMessage ?? 'Failed to create room.',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.onErrorColor,
+      listener: (context, state)  {
+        if (state.isLeaveSuccess) {
+          if (_leaveDialogContext != null) {
+            Navigator.of(_leaveDialogContext!).pop();
+            _leaveDialogContext = null;
+          }
+          context.read<RoomsCubit>().resetStatuses();
+        }
+
+        if (state.isCreateSuccess) {
+          Navigator.of(context).pop();
+          context.go('${AppRouter.rooms}/${state.newRoomId}');
+          context.read<RoomsCubit>().resetStatuses();
+        }
+
+        if (state.isCreateFailure) {
+          if (state.createError is AlreadyInRoom) {
+            showDialog(
+              context: context,
+              builder: (newContext) {
+                _leaveDialogContext = newContext;
+                return BlocProvider.value(
+                  value: context.read<RoomsCubit>(),
+                  child: LeaveRoomDialog(),
+                );
+              },
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.createError?.message ?? 'Failed to create room.',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.onErrorColor,
+                  ),
                 ),
+                backgroundColor: AppColors.errorColor,
               ),
-              backgroundColor: AppColors.errorColor,
-            ),
-          );
+            );
+          }
+          context.read<RoomsCubit>().resetStatuses();
         }
       },
       child: BlocBuilder<RoomsCubit, RoomsState>(
         builder: (context, state) {
-          final isCreating = state.createStatus == CreateRoomStatus.creating;
           return Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -138,31 +180,17 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
                         ),
                       ),
                       SizedBox(height: 24.h),
-
-                      // Room Name
-                      Text(
-                        'ROOM NAME',
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.textSecondaryColor,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      TextFormField(
+                      AppTextField(
+                        label: "ROOM NAME",
                         controller: _nameController,
+                        hintText: "e.g. Deep Work",
                         textInputAction: TextInputAction.next,
-                        enabled: !isCreating,
-                        validator: (value) =>
-                            (value == null || value.trim().isEmpty)
-                                ? 'Room name is required'
-                                : null,
-                        decoration: const InputDecoration(
-                          hintText: 'e.g. Deep Work',
+                        validator: (value) => Validators.validateEmpty(
+                          value,
+                          'Room name is required',
                         ),
                       ),
                       SizedBox(height: 20.h),
-
-                      // Type
                       Text(
                         'TYPE',
                         style: AppTextStyles.labelMedium.copyWith(
@@ -175,18 +203,19 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
                         spacing: 8.w,
                         runSpacing: 8.h,
                         children: [
-                          ..._types.map((type) => _TypeChip(
-                                label: type,
-                                isSelected: _selectedType == type,
-                                onTap: isCreating
-                                    ? null
-                                    : () =>
-                                        setState(() => _selectedType = type),
-                              )),
-                          _TypeChip(
+                          ..._types.map(
+                            (type) => RoomTypeChip(
+                              label: type,
+                              isSelected: _selectedType == type,
+                              onTap: state.isCreating
+                                  ? null
+                                  : () => setState(() => _selectedType = type),
+                            ),
+                          ),
+                          RoomTypeChip(
                             label: '+ Custom',
                             isSelected: false,
-                            onTap: isCreating ? null : _openAddTypeModal,
+                            onTap: state.isCreating ? null : _openAddTypeModal,
                           ),
                         ],
                       ),
@@ -207,10 +236,9 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
                           return Padding(
                             padding: EdgeInsets.only(right: 12.w),
                             child: GestureDetector(
-                              onTap: isCreating
+                              onTap: state.isCreating
                                   ? null
-                                  : () =>
-                                      setState(() => _selectedColor = hex),
+                                  : () => setState(() => _selectedColor = hex),
                               child: Container(
                                 width: 36.r,
                                 height: 36.r,
@@ -254,11 +282,13 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
                           ),
                           Switch(
                             value: _isPrivate,
-                            onChanged: isCreating
+                            onChanged: state.isCreating
                                 ? null
                                 : (v) => setState(() => _isPrivate = v),
                             activeThumbColor: AppColors.primaryColor,
-                          activeTrackColor: AppColors.primaryColor.withValues(alpha: 0.5),
+                            activeTrackColor: AppColors.primaryColor.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                         ],
                       ),
@@ -266,75 +296,23 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
                       // Password (conditional)
                       if (_isPrivate) ...[
                         SizedBox(height: 20.h),
-                        Text(
-                          'PASSWORD',
-                          style: AppTextStyles.labelMedium.copyWith(
-                            color: AppColors.textSecondaryColor,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        SizedBox(height: 8.h),
-                        TextFormField(
+                        AppTextField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
-                          enabled: !isCreating,
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                                  ? 'Password is required for private rooms'
-                                  : null,
-                          decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                size: 20.r,
-                                color: AppColors.textTertiaryColor,
-                              ),
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
-                            ),
-                          ),
+                          label: "PASSWORD",
+                          enabled: !state.isCreating,
+                          validator: Validators.validatePassword,
+                          hintText: "******",
                         ),
                       ],
 
                       SizedBox(height: 32.h),
 
                       // Submit button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52.h,
-                        child: ElevatedButton(
-                          onPressed:
-                              isCreating ? null : () => _submit(isCreating),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryColor,
-                            foregroundColor: AppColors.onPrimaryColor,
-                            disabledBackgroundColor:
-                                AppColors.primaryColor.withValues(alpha: 0.6),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
-                          child: isCreating
-                              ? SizedBox(
-                                  width: 22.r,
-                                  height: 22.r,
-                                  child: const CircularProgressIndicator(
-                                    strokeWidth: 2.5,
-                                    color: AppColors.onPrimaryColor,
-                                  ),
-                                )
-                              : Text(
-                                  'CREATE ROOM',
-                                  style: AppTextStyles.labelLarge.copyWith(
-                                    color: AppColors.onPrimaryColor,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.2,
-                                  ),
-                                ),
-                        ),
+                      AppLoadingButton(
+                        label: 'CREATE ROOM',
+                        onPressed: _submit,
+                        isLoading: state.isCreating,
                       ),
                     ],
                   ),
@@ -343,45 +321,6 @@ class _CreateRoomModalState extends State<CreateRoomModal> {
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _TypeChip extends StatelessWidget {
-  const _TypeChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryColor.withValues(alpha: 0.15)
-              : AppColors.inputBackgroundColor,
-          borderRadius: BorderRadius.circular(999),
-          border: isSelected
-              ? Border.all(color: AppColors.primaryColor, width: 1.5)
-              : Border.all(color: AppColors.borderColor, width: 1),
-        ),
-        child: Text(
-          label,
-          style: AppTextStyles.labelMedium.copyWith(
-            color: isSelected
-                ? AppColors.primaryColor
-                : AppColors.textSecondaryColor,
-          ),
-        ),
       ),
     );
   }

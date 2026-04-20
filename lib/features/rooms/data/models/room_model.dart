@@ -1,43 +1,51 @@
-class RoomModel {
-  const RoomModel({
-    required this.id,
-    required this.name,
-    required this.theme,
-    required this.currentUsers,
-    required this.capacity,
-    required this.focusMinutes,
-    required this.isLive,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:malaz/features/rooms/domain/entities/room.dart';
 
-  factory RoomModel.fromJson(Map<String, dynamic> json) {
-    return RoomModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      theme: json['theme'] as String,
-      currentUsers: json['current_users'] as int,
-      capacity: json['capacity'] as int,
-      focusMinutes: json['focus_minutes'] as int,
-      isLive: json['is_live'] as bool,
+part 'room_model.freezed.dart';
+part 'room_model.g.dart';
+
+@freezed
+abstract class RoomModel with _$RoomModel {
+  const RoomModel._();
+
+  const factory RoomModel({
+    required String id,
+    required String name,
+    String? description,
+    @JsonKey(name: 'background_url') String? backgroundUrl,
+    required String type,
+    required String color,
+    @JsonKey(name: 'members_avatars') required List<String> membersAvatars,
+    @JsonKey(name: 'active_members') required int activeMembers,
+    @JsonKey(name: 'max_members') required int maxMembers,
+    @JsonKey(name: 'is_protected') required bool isProtected,
+    @JsonKey(name: 'session_type') SessionType? sessionType,
+    @JsonKey(name: 'planned_minutes') int? plannedMinutes,
+    @JsonKey(name: 'paused_at') DateTime? pausedAt,
+    @JsonKey(name: 'session_started_at') DateTime? sessionStartedAt,
+    @JsonKey(name: 'is_member') required bool isMember,
+  }) = _RoomModel;
+
+  factory RoomModel.fromJson(Map<String, dynamic> json) =>
+      _$RoomModelFromJson(json);
+
+  Room toEntity() {
+    return Room(
+      id: id,
+      name: name,
+      type: type ,
+      color: color,
+      membersAvatars: membersAvatars ,
+      activeMembers: activeMembers ,
+      maxMembers: maxMembers ,
+      isProtected: isProtected,
+      backgroundUrl: backgroundUrl,
+      description: description,
+      sessionType: sessionType,
+      plannedMinutes: plannedMinutes,
+      pausedAt: pausedAt,
+      sessionStartedAt: sessionStartedAt,
+      isMember: isMember,
     );
-  }
-
-  final String id;
-  final String name;
-  final String theme;
-  final int currentUsers;
-  final int capacity;
-  final int focusMinutes;
-  final bool isLive;
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'theme': theme,
-      'current_users': currentUsers,
-      'capacity': capacity,
-      'focus_minutes': focusMinutes,
-      'is_live': isLive,
-    };
   }
 }

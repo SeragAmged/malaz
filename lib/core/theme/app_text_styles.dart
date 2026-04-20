@@ -167,4 +167,21 @@ abstract class AppTextStyles {
     color: AppColors.textSecondaryColor,
     fontFamily: manrope,
   );
+
+  static TextStyle get cardTagMedium => _style(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    height: 1.5,
+    letterSpacing: 2.0,
+    color: AppColors.textSecondaryColor,
+    fontFamily: manrope,
+  );
+  static TextStyle get appBarTitle => _style(
+    fontSize: 14,
+    fontFamily: spaceGrotesk,
+    fontWeight: FontWeight.w700,
+    height: 1.43,
+    letterSpacing: 1.40,
+    color: AppColors.primaryColor,
+  );
 }

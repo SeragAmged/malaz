@@ -27,6 +27,7 @@ abstract class AppColors {
   static const Color surfaceBrightColor = Color(0xFF2C3130);
   static const Color inverseSurfaceColor = Color(0xFFF1F5F4);
   static const Color onInverseSurfaceColor = Color(0xFF2A2F2E);
+  static const Color cardSurfaceColor = Color(0xFF1C2020);
 
   // Background colors
   static const Color backgroundColor = Color(0xFF0A0F0F);

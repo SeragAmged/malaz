@@ -7,6 +7,7 @@ import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/features/rooms/domain/entities/room.dart';
 import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
 import 'package:malaz/features/rooms/presentation/widgets/avatar_stack.dart';
 import 'package:malaz/features/rooms/presentation/widgets/join_room_modal.dart';
 
@@ -41,7 +42,7 @@ class _RoomCardState extends State<RoomCard> {
   }
 
   void _handleJoinPress() {
-    if (widget.room.isProtected) {
+    if (widget.room.isProtected && !widget.room.isMember) {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -56,11 +57,6 @@ class _RoomCardState extends State<RoomCard> {
       );
     } else {
       context.read<RoomsCubit>().joinRoom(widget.room.id, null);
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          context.go('${AppRouter.rooms}/${widget.room.id}');
-        }
-      });
     }
   }
 
@@ -149,39 +145,54 @@ class _RoomCardState extends State<RoomCard> {
                   children: [
                     AvatarStack(avatars: widget.room.membersAvatars),
                     const Spacer(),
-                    InkWell(
-                      onTap: _handleJoinPress,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 24.w,
-                          vertical: 10.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: accent,
-                          borderRadius: BorderRadius.circular(24.r),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              _isLive ? 'Go Back' : 'Join',
-                              style: AppTextStyles.labelMedium.copyWith(
-                                color: getContrastColor,
-                                fontWeight: FontWeight.w600,
-                              ),
+                    BlocBuilder<RoomsCubit, RoomsState>(
+                      builder: (context, state) {
+                        return InkWell(
+                          onTap: _handleJoinPress,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24.w,
+                              vertical: 10.h,
                             ),
-                            if (widget.room.isProtected)
-                              Padding(
-                                padding: EdgeInsets.only(left: 8.w),
-                                child: Icon(
-                                  Icons.lock_rounded,
-                                  size: 16.r,
-                                  color: getContrastColor,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
+                            decoration: BoxDecoration(
+                              color: accent,
+                              borderRadius: BorderRadius.circular(24.r),
+                            ),
+                            child: Row(
+                              children: [
+                                if (state.isJoining &&
+                                    state.joinedRoomId == widget.room.id)
+                                  SizedBox(
+                                    width: 16.r,
+                                    height: 16.r,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: getContrastColor,
+                                    ),
+                                  )
+                                else
+                                  Text(
+                                    widget.room.isMember ? 'Go Back' : 'Join',
+                                    style: AppTextStyles.labelMedium.copyWith(
+                                      color: getContrastColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                if (widget.room.isProtected)
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8.w),
+                                    child: Icon(
+                                      Icons.lock_rounded,
+                                      size: 16.r,
+                                      color: getContrastColor,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

@@ -75,7 +75,7 @@ class RoomsCubit extends Cubit<RoomsState> {
     );
   }
 
-  Future<void> fetchRoom(String roomId) async {
+  Future<void> fetchNewRoom(String roomId) async {
     final result = await _repository.getRoom(roomId);
     result.fold(
       onSuccess: (Room room) =>
@@ -98,6 +98,17 @@ class RoomsCubit extends Cubit<RoomsState> {
   }) async {
     if (state.isCreating) return;
     emit(state.copyWith(createStatus: UiStatus.loading));
+
+    if (!state.rooms.first.isMember) {
+      emit(
+        state.copyWith(
+          createStatus: UiStatus.failure,
+          createError: AlreadyInRoom(message: 'Already in room'),
+        ),
+      );
+      return;
+    }
+
     final result = await _repository.createRoom(
       name: name,
       type: type,
@@ -109,7 +120,10 @@ class RoomsCubit extends Cubit<RoomsState> {
         emit(
           state.copyWith(createStatus: UiStatus.success, newRoomId: newRoomId),
         );
-        fetchRoom(newRoomId);
+        if (state.rooms.first.isMember) {
+          _updateLeftRoom(state.rooms.first.id);
+        }
+        fetchNewRoom(newRoomId);
       },
       onFailure: (error, _) {
         emit(
@@ -119,11 +133,51 @@ class RoomsCubit extends Cubit<RoomsState> {
     );
   }
 
+  Future<void> _updateLeftRoom(String roomId) async {
+    final res = await _repository.getRoom(roomId);
+    res.fold(
+      onSuccess: (updatedRoom) {
+        final updatedRooms = List.of(state.rooms);
+
+        final freshIndex = updatedRooms.indexWhere((r) => r.id == roomId);
+        if (freshIndex == -1) return;
+
+        updatedRooms[freshIndex] = updatedRoom;
+
+        emit(state.copyWith(rooms: updatedRooms));
+      },
+      onFailure: (error, _) {},
+    );
+  }
+
+  Future<void> _updateJoinedRoom(String roomId) async {
+    if (state.rooms.first.isMember) {
+      _updateLeftRoom(state.rooms.first.id);
+    }
+
+    final res = await _repository.getRoom(roomId);
+    res.fold(
+      onSuccess: (updatedRoom) {
+        final updatedRooms = List.of(state.rooms);
+        final index = updatedRooms.indexWhere((r) => r.id == roomId);
+        if (index == -1) return;
+        updatedRooms.removeAt(index);
+        updatedRooms.insert(0, updatedRoom);
+        emit(state.copyWith(rooms: updatedRooms));
+      },
+      onFailure: (error, _) {},
+    );
+  }
+
   Future<void> leaveRoom() async {
     emit(state.copyWith(leaveRoomStatus: UiStatus.loading));
     final result = await _repository.leaveRoom();
     result.fold(
-      onSuccess: (_) => emit(state.copyWith(leaveRoomStatus: UiStatus.success)),
+      onSuccess: (roomId) {
+        emit(state.copyWith(leaveRoomStatus: UiStatus.success));
+        _updateLeftRoom(roomId);
+      },
+
       onFailure: (error, _) => emit(
         state.copyWith(
           leaveRoomStatus: UiStatus.failure,
@@ -135,7 +189,23 @@ class RoomsCubit extends Cubit<RoomsState> {
 
   Future<void> joinRoom(String roomId, String? password) async {
     if (state.isJoining) return;
-    emit(state.copyWith(joinStatus: UiStatus.loading));
+    emit(state.copyWith(joinStatus: UiStatus.loading, joinedRoomId: roomId));
+
+    final isMember = state.rooms.any(
+      (room) => room.id == roomId && room.isMember,
+    );
+    if (isMember) {
+      emit(state.copyWith(joinStatus: UiStatus.success, joinedRoomId: roomId));
+      return;
+    } else {
+      emit(
+        state.copyWith(
+          joinStatus: UiStatus.failure,
+          joinError: AlreadyInRoom(message: 'Already in room '),
+        ),
+      );
+      return;
+    }
 
     final result = await _repository.joinRoom(
       roomId: roomId,
@@ -143,10 +213,14 @@ class RoomsCubit extends Cubit<RoomsState> {
     );
 
     result.fold(
-      onSuccess: (_) => emit(state.copyWith(joinStatus: UiStatus.success)),
-      onFailure: (error, _) => emit(
-        state.copyWith(joinStatus: UiStatus.failure, joinError: error),
-      ),
+      onSuccess: (_) {
+        emit(
+          state.copyWith(joinStatus: UiStatus.success, joinedRoomId: roomId),
+        );
+        _updateJoinedRoom(roomId);
+      },
+      onFailure: (error, _) =>
+          emit(state.copyWith(joinStatus: UiStatus.failure, joinError: error)),
     );
   }
 
@@ -155,16 +229,9 @@ class RoomsCubit extends Cubit<RoomsState> {
       state.copyWith(
         createStatus: UiStatus.initial,
         leaveRoomStatus: UiStatus.initial,
+        joinStatus: UiStatus.initial,
         clearCreateError: true,
         clearLeaveRoomError: true,
-      ),
-    );
-  }
-
-  void resetJoinStatus() {
-    emit(
-      state.copyWith(
-        joinStatus: UiStatus.initial,
         clearJoinError: true,
       ),
     );

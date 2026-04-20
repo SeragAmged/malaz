@@ -49,4 +49,7 @@ class Validators {
     }
     return null;
   }
+
+  static String? validateEmpty(String? value, String errorString) =>
+      (value == null || value.trim().isEmpty) ? errorString : null;
 }

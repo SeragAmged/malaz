@@ -36,3 +36,11 @@ final class WeakPasswordError extends DomainError {
 final class AvatarLoadError extends DomainError {
   const AvatarLoadError({super.message});
 }
+
+final class SupabaseError extends DomainError {
+  const SupabaseError({super.message});
+}
+
+final class AlreadyInRoom extends SupabaseError {
+  const AlreadyInRoom({super.message});
+}

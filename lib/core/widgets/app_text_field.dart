@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../theme/app_colors.dart';
 
 /// Custom text field for auth screens
-class AuthTextField extends StatefulWidget {
+class AppTextField extends StatefulWidget {
   final String label;
   final String? hintText;
   final TextEditingController? controller;
@@ -14,8 +14,9 @@ class AuthTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final TextInputAction? textInputAction;
+  final bool? enabled;
 
-  const AuthTextField({
+  const AppTextField({
     super.key,
     required this.label,
     this.hintText,
@@ -26,13 +27,14 @@ class AuthTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.textInputAction,
+    this.enabled,
   });
 
   @override
-  State<AuthTextField> createState() => _AuthTextFieldState();
+  State<AppTextField> createState() => _AppTextFieldState();
 }
 
-class _AuthTextFieldState extends State<AuthTextField> {
+class _AppTextFieldState extends State<AppTextField> {
   late bool _obscureText;
 
   @override
@@ -63,6 +65,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
           keyboardType: widget.keyboardType,
           validator: widget.validator,
           onChanged: widget.onChanged,
+          enabled: widget.enabled,
           decoration: InputDecoration(
             hintText: widget.hintText,
             prefixIcon: widget.prefixIcon != null

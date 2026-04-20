@@ -5,18 +5,18 @@ import 'package:go_router/go_router.dart';
 import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
-import 'package:malaz/features/auth/presentation/validators.dart';
+import 'package:malaz/core/util/validators.dart';
 import 'package:malaz/features/auth/presentation/widgets/auth_branding.dart';
 import 'package:malaz/features/auth/presentation/widgets/auth_header.dart';
-import 'package:malaz/features/auth/presentation/widgets/auth_loading_button.dart';
+import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/features/auth/presentation/widgets/auth_navigation_link.dart';
-import 'package:malaz/features/auth/presentation/widgets/blurred_circle_decoration.dart';
+import 'package:malaz/core/widgets/blurred_circle_decoration.dart';
 import 'package:malaz/features/auth/presentation/widgets/info_box.dart';
 
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
-import '../widgets/auth_text_field.dart';
+import '../../../../core/widgets/app_text_field.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -105,7 +105,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           child: Column(
                             children: [
                               SizedBox(height: 16.h),
-                              AuthTextField(
+                              AppTextField(
                                 label: 'Email Address',
                                 hintText: 'Enter your email address',
                                 controller: _emailController,
@@ -117,7 +117,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               SizedBox(height: 24.h),
                               BlocBuilder<AuthCubit, AuthState>(
                                 builder: (context, state) {
-                                  return AuthLoadingButton(
+                                  return AppLoadingButton(
                                     label: 'Send Reset Link',
                                     isLoading: state.uiState == UiState.loading,
                                     onPressed: _onSendReset,
