@@ -9,9 +9,7 @@ class PresenceRemoteDataSource {
   /// Set the user's presence status
   /// [status] - presence status ('online', 'working', 'onBreak', 'idle', 'offline')
   Future<void> setMemberStatus(String status) async {
-    await supabase.rpc(
-      'set_member_status',
-      params: {'p_status': status},
-    );
+    return;
+    await supabase.rpc('set_member_status', params: {'p_status': status});
   }
 }

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TimerState {
 
- TimerStatus get status; SessionMode get mode; int get totalSeconds; int get remainingSeconds; String? get sessionId; bool get isLoading; String? get errorMessage; int get focusDuration; int get breakDuration;
+ TimerStatus get status; SessionMode get mode; int get totalSeconds; int get remainingSeconds; String? get sessionId; bool get isLoading; String? get errorMessage; int get focusDuration; int get breakDuration; DateTime? get sessionStartedAt;
 /// Create a copy of TimerState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $TimerStateCopyWith<TimerState> get copyWith => _$TimerStateCopyWithImpl<TimerSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimerState&&(identical(other.status, status) || other.status == status)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.totalSeconds, totalSeconds) || other.totalSeconds == totalSeconds)&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.focusDuration, focusDuration) || other.focusDuration == focusDuration)&&(identical(other.breakDuration, breakDuration) || other.breakDuration == breakDuration));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimerState&&(identical(other.status, status) || other.status == status)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.totalSeconds, totalSeconds) || other.totalSeconds == totalSeconds)&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.focusDuration, focusDuration) || other.focusDuration == focusDuration)&&(identical(other.breakDuration, breakDuration) || other.breakDuration == breakDuration)&&(identical(other.sessionStartedAt, sessionStartedAt) || other.sessionStartedAt == sessionStartedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,mode,totalSeconds,remainingSeconds,sessionId,isLoading,errorMessage,focusDuration,breakDuration);
+int get hashCode => Object.hash(runtimeType,status,mode,totalSeconds,remainingSeconds,sessionId,isLoading,errorMessage,focusDuration,breakDuration,sessionStartedAt);
 
 @override
 String toString() {
-  return 'TimerState(status: $status, mode: $mode, totalSeconds: $totalSeconds, remainingSeconds: $remainingSeconds, sessionId: $sessionId, isLoading: $isLoading, errorMessage: $errorMessage, focusDuration: $focusDuration, breakDuration: $breakDuration)';
+  return 'TimerState(status: $status, mode: $mode, totalSeconds: $totalSeconds, remainingSeconds: $remainingSeconds, sessionId: $sessionId, isLoading: $isLoading, errorMessage: $errorMessage, focusDuration: $focusDuration, breakDuration: $breakDuration, sessionStartedAt: $sessionStartedAt)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $TimerStateCopyWith<$Res>  {
   factory $TimerStateCopyWith(TimerState value, $Res Function(TimerState) _then) = _$TimerStateCopyWithImpl;
 @useResult
 $Res call({
- TimerStatus status, SessionMode mode, int totalSeconds, int remainingSeconds, String? sessionId, bool isLoading, String? errorMessage, int focusDuration, int breakDuration
+ TimerStatus status, SessionMode mode, int totalSeconds, int remainingSeconds, String? sessionId, bool isLoading, String? errorMessage, int focusDuration, int breakDuration, DateTime? sessionStartedAt
 });
 
 
@@ -62,7 +62,7 @@ class _$TimerStateCopyWithImpl<$Res>
 
 /// Create a copy of TimerState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? mode = null,Object? totalSeconds = null,Object? remainingSeconds = null,Object? sessionId = freezed,Object? isLoading = null,Object? errorMessage = freezed,Object? focusDuration = null,Object? breakDuration = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? mode = null,Object? totalSeconds = null,Object? remainingSeconds = null,Object? sessionId = freezed,Object? isLoading = null,Object? errorMessage = freezed,Object? focusDuration = null,Object? breakDuration = null,Object? sessionStartedAt = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TimerStatus,mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as String?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore:
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,focusDuration: null == focusDuration ? _self.focusDuration : focusDuration // ignore: cast_nullable_to_non_nullable
 as int,breakDuration: null == breakDuration ? _self.breakDuration : breakDuration // ignore: cast_nullable_to_non_nullable
-as int,
+as int,sessionStartedAt: freezed == sessionStartedAt ? _self.sessionStartedAt : sessionStartedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TimerStatus status,  SessionMode mode,  int totalSeconds,  int remainingSeconds,  String? sessionId,  bool isLoading,  String? errorMessage,  int focusDuration,  int breakDuration)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TimerStatus status,  SessionMode mode,  int totalSeconds,  int remainingSeconds,  String? sessionId,  bool isLoading,  String? errorMessage,  int focusDuration,  int breakDuration,  DateTime? sessionStartedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TimerState() when $default != null:
-return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSeconds,_that.sessionId,_that.isLoading,_that.errorMessage,_that.focusDuration,_that.breakDuration);case _:
+return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSeconds,_that.sessionId,_that.isLoading,_that.errorMessage,_that.focusDuration,_that.breakDuration,_that.sessionStartedAt);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSecond
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TimerStatus status,  SessionMode mode,  int totalSeconds,  int remainingSeconds,  String? sessionId,  bool isLoading,  String? errorMessage,  int focusDuration,  int breakDuration)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TimerStatus status,  SessionMode mode,  int totalSeconds,  int remainingSeconds,  String? sessionId,  bool isLoading,  String? errorMessage,  int focusDuration,  int breakDuration,  DateTime? sessionStartedAt)  $default,) {final _that = this;
 switch (_that) {
 case _TimerState():
-return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSeconds,_that.sessionId,_that.isLoading,_that.errorMessage,_that.focusDuration,_that.breakDuration);case _:
+return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSeconds,_that.sessionId,_that.isLoading,_that.errorMessage,_that.focusDuration,_that.breakDuration,_that.sessionStartedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSecond
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TimerStatus status,  SessionMode mode,  int totalSeconds,  int remainingSeconds,  String? sessionId,  bool isLoading,  String? errorMessage,  int focusDuration,  int breakDuration)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TimerStatus status,  SessionMode mode,  int totalSeconds,  int remainingSeconds,  String? sessionId,  bool isLoading,  String? errorMessage,  int focusDuration,  int breakDuration,  DateTime? sessionStartedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _TimerState() when $default != null:
-return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSeconds,_that.sessionId,_that.isLoading,_that.errorMessage,_that.focusDuration,_that.breakDuration);case _:
+return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSeconds,_that.sessionId,_that.isLoading,_that.errorMessage,_that.focusDuration,_that.breakDuration,_that.sessionStartedAt);case _:
   return null;
 
 }
@@ -214,7 +215,7 @@ return $default(_that.status,_that.mode,_that.totalSeconds,_that.remainingSecond
 
 
 class _TimerState extends TimerState {
-  const _TimerState({this.status = TimerStatus.idle, this.mode = SessionMode.focus, this.totalSeconds = 1500, this.remainingSeconds = 1500, this.sessionId, this.isLoading = false, this.errorMessage, this.focusDuration = 25, this.breakDuration = 5}): super._();
+  const _TimerState({this.status = TimerStatus.idle, this.mode = SessionMode.focus, this.totalSeconds = 1500, this.remainingSeconds = 1500, this.sessionId, this.isLoading = false, this.errorMessage, this.focusDuration = 25, this.breakDuration = 5, this.sessionStartedAt}): super._();
   
 
 @override@JsonKey() final  TimerStatus status;
@@ -226,6 +227,7 @@ class _TimerState extends TimerState {
 @override final  String? errorMessage;
 @override@JsonKey() final  int focusDuration;
 @override@JsonKey() final  int breakDuration;
+@override final  DateTime? sessionStartedAt;
 
 /// Create a copy of TimerState
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +239,16 @@ _$TimerStateCopyWith<_TimerState> get copyWith => __$TimerStateCopyWithImpl<_Tim
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TimerState&&(identical(other.status, status) || other.status == status)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.totalSeconds, totalSeconds) || other.totalSeconds == totalSeconds)&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.focusDuration, focusDuration) || other.focusDuration == focusDuration)&&(identical(other.breakDuration, breakDuration) || other.breakDuration == breakDuration));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TimerState&&(identical(other.status, status) || other.status == status)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.totalSeconds, totalSeconds) || other.totalSeconds == totalSeconds)&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage)&&(identical(other.focusDuration, focusDuration) || other.focusDuration == focusDuration)&&(identical(other.breakDuration, breakDuration) || other.breakDuration == breakDuration)&&(identical(other.sessionStartedAt, sessionStartedAt) || other.sessionStartedAt == sessionStartedAt));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,status,mode,totalSeconds,remainingSeconds,sessionId,isLoading,errorMessage,focusDuration,breakDuration);
+int get hashCode => Object.hash(runtimeType,status,mode,totalSeconds,remainingSeconds,sessionId,isLoading,errorMessage,focusDuration,breakDuration,sessionStartedAt);
 
 @override
 String toString() {
-  return 'TimerState(status: $status, mode: $mode, totalSeconds: $totalSeconds, remainingSeconds: $remainingSeconds, sessionId: $sessionId, isLoading: $isLoading, errorMessage: $errorMessage, focusDuration: $focusDuration, breakDuration: $breakDuration)';
+  return 'TimerState(status: $status, mode: $mode, totalSeconds: $totalSeconds, remainingSeconds: $remainingSeconds, sessionId: $sessionId, isLoading: $isLoading, errorMessage: $errorMessage, focusDuration: $focusDuration, breakDuration: $breakDuration, sessionStartedAt: $sessionStartedAt)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$TimerStateCopyWith<$Res> implements $TimerStateCopyWith<$
   factory _$TimerStateCopyWith(_TimerState value, $Res Function(_TimerState) _then) = __$TimerStateCopyWithImpl;
 @override @useResult
 $Res call({
- TimerStatus status, SessionMode mode, int totalSeconds, int remainingSeconds, String? sessionId, bool isLoading, String? errorMessage, int focusDuration, int breakDuration
+ TimerStatus status, SessionMode mode, int totalSeconds, int remainingSeconds, String? sessionId, bool isLoading, String? errorMessage, int focusDuration, int breakDuration, DateTime? sessionStartedAt
 });
 
 
@@ -274,7 +276,7 @@ class __$TimerStateCopyWithImpl<$Res>
 
 /// Create a copy of TimerState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? mode = null,Object? totalSeconds = null,Object? remainingSeconds = null,Object? sessionId = freezed,Object? isLoading = null,Object? errorMessage = freezed,Object? focusDuration = null,Object? breakDuration = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? mode = null,Object? totalSeconds = null,Object? remainingSeconds = null,Object? sessionId = freezed,Object? isLoading = null,Object? errorMessage = freezed,Object? focusDuration = null,Object? breakDuration = null,Object? sessionStartedAt = freezed,}) {
   return _then(_TimerState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as TimerStatus,mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
@@ -285,7 +287,8 @@ as String?,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore:
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,focusDuration: null == focusDuration ? _self.focusDuration : focusDuration // ignore: cast_nullable_to_non_nullable
 as int,breakDuration: null == breakDuration ? _self.breakDuration : breakDuration // ignore: cast_nullable_to_non_nullable
-as int,
+as int,sessionStartedAt: freezed == sessionStartedAt ? _self.sessionStartedAt : sessionStartedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

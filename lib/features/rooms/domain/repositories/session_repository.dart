@@ -1,5 +1,6 @@
 import '../../../../core/util/errors/domain_errors.dart';
 import '../../../../core/util/result.dart';
+import '../entities/active_session.dart';
 
 abstract interface class SessionRepository {
   /// Start a new session
@@ -26,4 +27,8 @@ abstract interface class SessionRepository {
     String sessionId,
     String reason,
   );
+
+  /// Fetch the current user's active (running or paused) session
+  /// Returns null if no active session exists
+  Future<Result<ActiveSession?, DomainError>> getActiveSession();
 }

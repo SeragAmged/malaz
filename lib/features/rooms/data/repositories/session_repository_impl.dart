@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../core/util/errors/domain_errors.dart';
 import '../../../../core/util/result.dart';
+import '../../domain/entities/active_session.dart';
 import '../../domain/repositories/session_repository.dart';
 import '../datasources/session_remote_datasource.dart';
 
@@ -54,6 +55,16 @@ class SessionRepositoryImpl implements SessionRepository {
     try {
       await _dataSource.endSession(sessionId, reason);
       return Success(null);
+    } on Exception catch (e) {
+      return Failure(UnknownError(message: e.toString()), null);
+    }
+  }
+
+  @override
+  Future<Result<ActiveSession?, DomainError>> getActiveSession() async {
+    try {
+      final model = await _dataSource.getActiveSession();
+      return Success(model?.toEntity());
     } on Exception catch (e) {
       return Failure(UnknownError(message: e.toString()), null);
     }

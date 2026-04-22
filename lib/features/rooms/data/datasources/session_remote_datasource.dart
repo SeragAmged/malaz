@@ -1,6 +1,8 @@
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/active_session_model.dart';
+
 @injectable
 class SessionRemoteDataSource {
   const SessionRemoteDataSource({required this.supabase});
@@ -24,19 +26,13 @@ class SessionRemoteDataSource {
   /// Pause an ongoing session
   /// [sessionId] - ID of the session to pause
   Future<void> pauseSession(String sessionId) async {
-    await supabase.rpc(
-      'pause_session',
-      params: {'p_session_id': sessionId},
-    );
+    await supabase.rpc('pause_session', params: {'p_session_id': sessionId});
   }
 
   /// Resume a paused session
   /// [sessionId] - ID of the session to resume
   Future<void> resumeSession(String sessionId) async {
-    await supabase.rpc(
-      'resume_session',
-      params: {'p_session_id': sessionId},
-    );
+    await supabase.rpc('resume_session', params: {'p_session_id': sessionId});
   }
 
   /// End a session
@@ -45,10 +41,17 @@ class SessionRemoteDataSource {
   Future<void> endSession(String sessionId, String reason) async {
     await supabase.rpc(
       'end_session',
-      params: {
-        'p_session_id': sessionId,
-        'p_reason': reason,
-      },
+      params: {'p_session_id': sessionId, 'p_ended_reason': reason},
     );
+  }
+
+  /// Fetch the current user's active session from the view
+  Future<ActiveSessionModel?> getActiveSession() async {
+    final response = await supabase
+        .from('active_session_view')
+        .select()
+        .maybeSingle();
+    if (response == null) return null;
+    return ActiveSessionModel.fromJson(Map<String, dynamic>.from(response));
   }
 }

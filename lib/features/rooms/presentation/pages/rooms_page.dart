@@ -65,7 +65,7 @@ class _RoomsViewState extends State<_RoomsView> {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
-        title: Text('M A L A Z', style: AppTextStyles.appBarTitle),
+        title: Text('M A L A Z', style: AppTextStyles.appBarTitle14),
         centerTitle: false,
         backgroundColor: Colors.transparent,
         elevation: 0,

@@ -34,6 +34,8 @@ class _RoomScreenState extends State<RoomScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _timerCubit = getIt<TimerCubit>(param1: widget.roomId);
+    // Attempt to recover any active session from the server
+    _timerCubit.tryRecoverSession();
   }
 
   @override

@@ -20,6 +20,7 @@ abstract class TimerState with _$TimerState {
     String? errorMessage,
     @Default(25) int focusDuration,
     @Default(5) int breakDuration,
+    DateTime? sessionStartedAt,
   }) = _TimerState;
 
   // Computed getters

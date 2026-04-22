@@ -12,6 +12,7 @@ class TimerCubit extends Cubit<TimerState> {
   final PresenceRepository _presenceRepository;
 
   Timer? _ticker;
+  DateTime? _backgroundedAt; // wall-clock time when app went to background
 
   TimerCubit({
     required this.roomId,
@@ -52,6 +53,7 @@ class TimerCubit extends Cubit<TimerState> {
           state.copyWith(
             sessionId: sessionId,
             status: TimerStatus.running,
+            sessionStartedAt: null,
             isLoading: false,
             errorMessage: null,
           ),
@@ -147,10 +149,12 @@ class TimerCubit extends Cubit<TimerState> {
     result.fold(
       onSuccess: (_) {
         _flipMode();
+        _backgroundedAt = null;
         emit(
           state.copyWith(
             sessionId: null,
             status: TimerStatus.idle,
+            sessionStartedAt: null,
             isLoading: false,
             errorMessage: null,
           ),
@@ -208,7 +212,8 @@ class TimerCubit extends Cubit<TimerState> {
 
   /// Set user as offline
   Future<void> setOffline() async {
-    _ticker?.cancel();
+    if (state.isRunning) _backgroundedAt = DateTime.now();
+    // do NOT cancel ticker - it may be paused by OS but we reconcile on resume
 
     final result = await _presenceRepository.setStatus('offline');
 
@@ -230,6 +235,27 @@ class TimerCubit extends Cubit<TimerState> {
 
   /// Set user as online
   Future<void> setOnline() async {
+    // Reconcile timer if we were running when we went to background
+    if (_backgroundedAt != null && state.isRunning) {
+      final elapsed = DateTime.now().difference(_backgroundedAt!).inSeconds;
+      _backgroundedAt = null;
+
+      final newRemaining = state.remainingSeconds - elapsed;
+
+      if (newRemaining <= 0) {
+        // Session expired while app was backgrounded
+        _ticker?.cancel();
+        endSession(reason: 'completed');
+        return;
+      }
+
+      // Update remaining and restart ticker to re-sync 1s interval
+      emit(state.copyWith(remainingSeconds: newRemaining));
+      _startTicker();
+    } else {
+      _backgroundedAt = null;
+    }
+
     final status = state.isRunning ? 'working' : 'online';
     final result = await _presenceRepository.setStatus(status);
 
@@ -249,9 +275,79 @@ class TimerCubit extends Cubit<TimerState> {
     );
   }
 
+  /// Attempt to recover an active session from the server
+  Future<void> tryRecoverSession() async {
+    emit(state.copyWith(isLoading: true));
+
+    final result = await _sessionRepository.getActiveSession();
+
+    if (isClosed) return;
+
+    result.fold(
+      onSuccess: (session) {
+        if (session == null) {
+          emit(state.copyWith(isLoading: false));
+          return;
+        }
+
+        // Set sessionId first so endSession can call RPC if expired
+        emit(state.copyWith(sessionId: session.sessionId, isLoading: false));
+
+        final plannedSeconds = session.plannedMinutes * 60;
+        final int remaining;
+
+        if (session.status == 'paused' && session.pausedAt != null) {
+          // elapsed active time = (paused_at - started_at) - total_paused_seconds_before
+          // total_paused_seconds already includes all previous pauses but NOT the current one
+          final totalElapsed =
+              session.pausedAt!.difference(session.startedAt).inSeconds;
+          final activeElapsed = totalElapsed - session.totalPausedSeconds;
+          remaining = (plannedSeconds - activeElapsed).clamp(0, plannedSeconds);
+        } else {
+          // elapsed active time = (now - started_at) - total_paused_seconds
+          final totalElapsed =
+              DateTime.now().difference(session.startedAt).inSeconds;
+          final activeElapsed = totalElapsed - session.totalPausedSeconds;
+          remaining = (plannedSeconds - activeElapsed).clamp(0, plannedSeconds);
+        }
+
+        if (remaining <= 0) {
+          endSession(reason: 'completed');
+          return;
+        }
+
+        final mode = session.sessionType == 'focus'
+            ? SessionMode.focus
+            : SessionMode.breakTime;
+
+        emit(state.copyWith(
+          status: session.status == 'running'
+              ? TimerStatus.running
+              : TimerStatus.paused,
+          mode: mode,
+          totalSeconds: plannedSeconds,
+          remainingSeconds: remaining,
+          sessionStartedAt: session.startedAt,
+          errorMessage: null,
+        ));
+
+        if (session.status == 'running') {
+          _startTicker();
+        }
+      },
+      onFailure: (_, _) =>
+          emit(state.copyWith(isLoading: false)), // silently fail
+    );
+  }
+
   /// Start the ticker that decrements the timer every second
   void _startTicker() {
     _ticker?.cancel();
+    // Record the wall-clock start time if not already set
+    // (preserves it on resume so elapsed math stays correct)
+    if (state.sessionStartedAt == null) {
+      emit(state.copyWith(sessionStartedAt: DateTime.now()));
+    }
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       _onTick();
     });
