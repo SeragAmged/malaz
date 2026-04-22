@@ -176,12 +176,35 @@ abstract class AppTextStyles {
     color: AppColors.textSecondaryColor,
     fontFamily: manrope,
   );
-  static TextStyle get appBarTitle => _style(
+  static TextStyle get appBarTitle14 => _style(
     fontSize: 14,
     fontFamily: spaceGrotesk,
     fontWeight: FontWeight.w700,
     height: 1.43,
     letterSpacing: 1.40,
     color: AppColors.primaryColor,
+  );
+  static TextStyle get appBarTitle20 => _style(
+    fontSize: 20,
+    fontFamily: spaceGrotesk,
+    fontWeight: FontWeight.w700,
+    height: 1.43,
+    letterSpacing: 1.40,
+    color: AppColors.primaryColor,
+  );
+
+  static TextStyle get digitStyle => TextStyle(
+    fontFamily: spaceGrotesk,
+    fontSize: 80,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimaryColor,
+    letterSpacing: 0,
+    height: 1,
+  );
+
+  static const TextStyle timerDisplay = TextStyle(
+    fontSize: 72,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
   );
 }
