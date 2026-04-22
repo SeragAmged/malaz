@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
 import 'package:malaz/features/rooms/domain/repositories/presence_repository.dart';
 import 'package:malaz/features/rooms/domain/repositories/session_repository.dart';
 
 import 'timer_state.dart';
 
-@injectable
 class TimerCubit extends Cubit<TimerState> {
   final String roomId;
   final SessionRepository _sessionRepository;

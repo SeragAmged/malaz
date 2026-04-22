@@ -20,12 +20,26 @@ import 'package:malaz/features/auth/domain/repositories/auth_repository.dart'
     as _i146;
 import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart'
     as _i281;
+import 'package:malaz/features/rooms/data/datasources/presence_remote_datasource.dart'
+    as _i529;
+import 'package:malaz/features/rooms/data/datasources/session_remote_datasource.dart'
+    as _i744;
+import 'package:malaz/features/rooms/data/repositories/presence_repository_impl.dart'
+    as _i477;
+import 'package:malaz/features/rooms/data/repositories/session_repository_impl.dart'
+    as _i865;
 import 'package:malaz/features/rooms/data/rooms_remote_datasource.dart'
     as _i986;
 import 'package:malaz/features/rooms/data/rooms_repository_impl.dart' as _i557;
+import 'package:malaz/features/rooms/domain/repositories/presence_repository.dart'
+    as _i590;
+import 'package:malaz/features/rooms/domain/repositories/session_repository.dart'
+    as _i23;
 import 'package:malaz/features/rooms/domain/rooms_repository.dart' as _i756;
 import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart'
     as _i235;
+import 'package:malaz/features/rooms/presentation/cubit/timer_cubit.dart'
+    as _i4;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
@@ -42,9 +56,17 @@ extension GetItInjectableX on _i174.GetIt {
       preResolve: true,
     );
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
+    gh.factory<_i529.PresenceRemoteDataSource>(
+      () =>
+          _i529.PresenceRemoteDataSource(supabase: gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i744.SessionRemoteDataSource>(
+      () => _i744.SessionRemoteDataSource(supabase: gh<_i454.SupabaseClient>()),
+    );
     gh.factory<_i986.RoomsRemoteDataSource>(
       () => _i986.RoomsRemoteDataSource(supabase: gh<_i454.SupabaseClient>()),
     );
+    gh.factory<_i4.TimerCubit>(() => registerModule.timerCubit(gh<String>()));
     gh.lazySingleton<_i121.AuthRemoteDataSourceImpl>(
       () => _i121.AuthRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
@@ -57,6 +79,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i235.RoomsCubit>(
       () => _i235.RoomsCubit(gh<_i756.RoomsRepository>()),
+    );
+    gh.factory<_i590.PresenceRepository>(
+      () => _i477.PresenceRepositoryImpl(gh<_i529.PresenceRemoteDataSource>()),
+    );
+    gh.factory<_i23.SessionRepository>(
+      () => _i865.SessionRepositoryImpl(gh<_i744.SessionRemoteDataSource>()),
     );
     gh.lazySingleton<_i281.AuthCubit>(
       () => _i281.AuthCubit(gh<_i146.AuthRepository>()),
