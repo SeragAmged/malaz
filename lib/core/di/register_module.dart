@@ -3,6 +3,8 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:malaz/features/rooms/presentation/cubit/timer_cubit.dart';
+import 'package:malaz/features/rooms/domain/repositories/session_repository.dart';
+import 'package:malaz/features/rooms/domain/repositories/presence_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -17,11 +19,13 @@ abstract class RegisterModule {
 
   @injectable
   TimerCubit timerCubit(
-    String roomId,
+    @factoryParam String roomId,
+    SessionRepository sessionRepository,
+    PresenceRepository presenceRepository,
   ) =>
       TimerCubit(
         roomId: roomId,
-        sessionRepository: getIt(),
-        presenceRepository: getIt(),
+        sessionRepository: sessionRepository,
+        presenceRepository: presenceRepository,
       );
 }

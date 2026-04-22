@@ -66,7 +66,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i986.RoomsRemoteDataSource>(
       () => _i986.RoomsRemoteDataSource(supabase: gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i4.TimerCubit>(() => registerModule.timerCubit(gh<String>()));
     gh.lazySingleton<_i121.AuthRemoteDataSourceImpl>(
       () => _i121.AuthRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
@@ -85,6 +84,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i23.SessionRepository>(
       () => _i865.SessionRepositoryImpl(gh<_i744.SessionRemoteDataSource>()),
+    );
+    gh.factoryParam<_i4.TimerCubit, String, dynamic>(
+      (roomId, _) => registerModule.timerCubit(
+        roomId,
+        gh<_i23.SessionRepository>(),
+        gh<_i590.PresenceRepository>(),
+      ),
     );
     gh.lazySingleton<_i281.AuthCubit>(
       () => _i281.AuthCubit(gh<_i146.AuthRepository>()),
