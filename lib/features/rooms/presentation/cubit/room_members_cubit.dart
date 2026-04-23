@@ -90,9 +90,9 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
     );
   }
 
-  /// Callback when a realtime event occurs
+  /// Callback when a realtime event occurs — fire-and-forget
   void _onRealtimeEvent() {
-    _fetchMembers();
+    _fetchMembers(); // ignore: unawaited_futures
   }
 
   /// Start 1-second ticker to update localNow
