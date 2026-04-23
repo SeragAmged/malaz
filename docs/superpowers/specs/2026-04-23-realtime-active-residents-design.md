@@ -81,25 +81,36 @@ Fields:
   - `pausedAt: DateTime?`
   - `totalPausedSeconds: int?`
 
-### New datasource method on `RoomsRemoteDataSource`
+### New datasource methods on `RoomsRemoteDataSource`
 
 ```dart
 Future<List<RoomMemberWithSession>> getMembersWithSession(String roomId)
 ```
-
 Queries `room_members_with_session` with `.eq('room_id', roomId)`.
+
+```dart
+RealtimeChannel subscribeToRoomChanges(String roomId, VoidCallback onEvent)
+```
+Creates and subscribes a single `RealtimeChannel` that listens to Postgres changes on both `room_members` and `pomodoro_sessions`, filtered to `room_id=eq.<roomId>`. Calls `onEvent` on any INSERT/UPDATE/DELETE from either table. Returns the channel so the caller can unsubscribe later.
+
+```dart
+Future<void> unsubscribeFromRoomChanges(RealtimeChannel channel)
+```
+Removes the channel from the Supabase client.
 
 ### New repository interface: `RoomMembersRepository`
 
 ```dart
 abstract class RoomMembersRepository {
   Future<Result<List<RoomMemberWithSession>>> getMembers(String roomId);
+  RealtimeChannel subscribeToRoomChanges(String roomId, VoidCallback onEvent);
+  Future<void> unsubscribeFromRoomChanges(RealtimeChannel channel);
 }
 ```
 
 ### New repository impl: `RoomMembersRepositoryImpl`
 
-Delegates to `RoomsRemoteDataSource.getMembersWithSession`.
+Delegates all three methods to `RoomsRemoteDataSource`.
 
 ---
 
@@ -121,18 +132,18 @@ class RoomMembersState with _$RoomMembersState {
 
 ### New cubit: `RoomMembersCubit`
 
-**Dependencies:** `RoomMembersRepository`, `SupabaseClient`
+**Dependencies:** `RoomMembersRepository`
 
 **Lifecycle:**
 
-1. `init(roomId)` — fetch members, subscribe to Realtime, start 1s ticker
-2. On any Realtime event from `room_members` or `pomodoro_sessions` (filtered to `room_id=eq.<roomId>`) — re-fetch `getMembersWithSession(roomId)`
+1. `init(roomId)` — fetch members, call `_repository.subscribeToRoomChanges(roomId, _onRoomEvent)`, start 1s ticker
+2. `_onRoomEvent()` — re-fetch `getMembers(roomId)` and emit updated members
 3. `Timer.periodic(1s)` — `emit(state.copyWith(localNow: DateTime.now()))`
-4. `onPause()` — cancel ticker (channels may be dropped by OS)
-5. `onResume()` — re-fetch, restart ticker, re-subscribe Realtime channels
-6. `close()` — cancel ticker, unsubscribe all Realtime channels
+4. `onPause()` — cancel ticker; call `_repository.unsubscribeFromRoomChanges(_channel)`
+5. `onResume()` — re-fetch, re-subscribe via `_repository.subscribeToRoomChanges`, restart ticker
+6. `close()` — cancel ticker, unsubscribe channel
 
-**Realtime subscription filter:** `room_id=eq.<roomId>` on both tables ensures no cross-room re-fetches.
+**The cubit never touches `SupabaseClient` directly** — all Realtime and DB access goes through the repository.
 
 ### Display logic (computed in widget, not stored in state)
 
