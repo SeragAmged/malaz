@@ -54,62 +54,38 @@ class RoomMemberWithSession {
 }
 ```
 
-- [ ] **Step 2: Create the model with fromJson**
+- [ ] **Step 2: Create the freezed model with fromJson**
 
 ```dart
 // lib/features/rooms/data/models/room_member_with_session_model.dart
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/room_member_with_session.dart';
 
-class RoomMemberWithSessionModel {
-  const RoomMemberWithSessionModel({
-    required this.userId,
-    required this.fullName,
-    required this.avatarUrl,
-    required this.status,
-    required this.lastCheckinAt,
-    required this.completedFocusSeconds,
-    this.sessionId,
-    this.sessionType,
-    this.startedAt,
-    this.plannedMinutes,
-    this.pausedAt,
-    this.totalPausedSeconds,
-  });
+part 'room_member_with_session_model.freezed.dart';
+part 'room_member_with_session_model.g.dart';
 
-  final String userId;
-  final String fullName;
-  final String? avatarUrl;
-  final String status;
-  final DateTime lastCheckinAt;
-  final int completedFocusSeconds;
-  final String? sessionId;
-  final String? sessionType;
-  final DateTime? startedAt;
-  final int? plannedMinutes;
-  final DateTime? pausedAt;
-  final int? totalPausedSeconds;
+@freezed
+class RoomMemberWithSessionModel with _$RoomMemberWithSessionModel {
+  const RoomMemberWithSessionModel._();
 
-  factory RoomMemberWithSessionModel.fromJson(Map<String, dynamic> json) {
-    return RoomMemberWithSessionModel(
-      userId: json['user_id'] as String,
-      fullName: json['full_name'] as String,
-      avatarUrl: json['avatar_url'] as String?,
-      status: json['status'] as String,
-      lastCheckinAt: DateTime.parse(json['last_checkin_at'] as String),
-      completedFocusSeconds: json['completed_focus_seconds'] as int,
-      sessionId: json['session_id'] as String?,
-      sessionType: json['session_type'] as String?,
-      startedAt: json['started_at'] != null
-          ? DateTime.parse(json['started_at'] as String)
-          : null,
-      plannedMinutes: json['planned_minutes'] as int?,
-      pausedAt: json['paused_at'] != null
-          ? DateTime.parse(json['paused_at'] as String)
-          : null,
-      totalPausedSeconds: json['total_paused_seconds'] as int?,
-    );
-  }
+  const factory RoomMemberWithSessionModel({
+    required String userId,
+    required String fullName,
+    String? avatarUrl,
+    required String status,
+    required DateTime lastCheckinAt,
+    required int completedFocusSeconds,
+    String? sessionId,
+    String? sessionType,
+    DateTime? startedAt,
+    int? plannedMinutes,
+    DateTime? pausedAt,
+    int? totalPausedSeconds,
+  }) = _RoomMemberWithSessionModel;
+
+  factory RoomMemberWithSessionModel.fromJson(Map<String, dynamic> json) =>
+      _$RoomMemberWithSessionModelFromJson(json);
 
   RoomMemberWithSession toEntity() => RoomMemberWithSession(
     userId: userId,
@@ -128,12 +104,20 @@ class RoomMemberWithSessionModel {
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Run build_runner to generate freezed code**
+
+```bash
+dart run build_runner build
+```
+
+- [ ] **Step 4: Commit**
 
 ```bash
 git add lib/features/rooms/domain/entities/room_member_with_session.dart \
-        lib/features/rooms/data/models/room_member_with_session_model.dart
-git commit -m "feat(rooms): add RoomMemberWithSession entity and model"
+        lib/features/rooms/data/models/room_member_with_session_model.dart \
+        lib/features/rooms/data/models/room_member_with_session_model.freezed.dart \
+        lib/features/rooms/data/models/room_member_with_session_model.g.dart
+git commit -m "feat(rooms): add RoomMemberWithSession entity and freezed model"
 ```
 
 ---
