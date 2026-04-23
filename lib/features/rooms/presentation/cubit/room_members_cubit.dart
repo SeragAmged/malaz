@@ -6,7 +6,7 @@ import '../../domain/repositories/room_members_repository.dart';
 import '../../data/models/room_member_with_session_model.dart';
 import 'room_members_state.dart';
 
-@injectable
+
 class RoomMembersCubit extends Cubit<RoomMembersState> {
   final String roomId;
   final RoomMembersRepository _repository;
@@ -90,16 +90,23 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
     );
   }
 
-  /// Callback when a realtime event occurs — fire-and-forget
+  /// Callback when a realtime event occurs
   void _onRealtimeEvent() {
-    _fetchMembers(); // ignore: unawaited_futures
+    unawaited(_fetchMembers());
   }
 
-  /// Start 1-second ticker to update localNow
+  /// Start 1-second ticker to update localNow (only if members have active sessions)
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!isClosed) {
+      if (isClosed) return;
+
+      // Only tick if at least one member has an active running session
+      final hasActiveSession = state.members.any((member) =>
+          member.sessionId != null &&
+          member.pausedAt == null);
+
+      if (hasActiveSession) {
         emit(state.copyWith(localNow: DateTime.now()));
       }
     });
