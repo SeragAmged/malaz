@@ -6,13 +6,16 @@ import 'package:malaz/core/di/providers.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
-import 'package:malaz/features/rooms/presentation/cubit/timer_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/timer_state.dart';
-import 'package:malaz/features/rooms/presentation/cubit/room_members_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/room_members_state.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
+import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
+import 'package:malaz/features/rooms/presentation/cubit/timer/timer_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/timer/timer_state.dart';
+import 'package:malaz/features/rooms/presentation/cubit/room_members/room_members_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/room_members/room_members_state.dart';
 import 'package:malaz/features/rooms/data/models/room_member_with_session_model.dart';
-import 'package:malaz/features/rooms/presentation/pages/outlined_action_button.dart';
-import 'package:malaz/features/rooms/presentation/pages/room_timer_card_shell.dart';
+import 'package:malaz/features/rooms/presentation/widgets/room/outlined_action_button.dart';
+import 'package:malaz/features/rooms/presentation/widgets/room/room_timer_card_shell.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/rooms_card_avatar.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class RoomPage extends StatefulWidget {
@@ -124,7 +127,7 @@ class _RoomPageState extends State<RoomPage> with WidgetsBindingObserver {
                       ),
                     ),
                   RoomTimerCardShell(
-                    color: timerState.mode == SessionMode.focus
+                    color: timerState.isFocusMode
                         ? AppColors.primaryColor
                         : AppColors.warningColor,
                     isEditing: _isEditing,
@@ -158,7 +161,10 @@ class _RoomPageState extends State<RoomPage> with WidgetsBindingObserver {
                     ),
                   ),
                   SizedBox(height: 24.h),
-                  const _ActiveResidentsCard(),
+                  BlocProvider.value(
+                    value: _roomMembersCubit,
+                    child: const _ActiveResidentsCard(),
+                  ),
                   SizedBox(height: 24.h),
                   const _LeaderboardCard(),
                 ],
@@ -187,7 +193,7 @@ class _TimerCard extends StatelessWidget {
     required this.timerStatus,
   });
 
-  final SessionMode mode;
+  final SessionType mode;
   final TimerStatus timerStatus;
   final String timerDisplay;
   final bool isRunning;
@@ -200,8 +206,9 @@ class _TimerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isBreak = mode == SessionMode.breakTime;
+    final isBreak = mode == SessionType.breakTime;
     final isPaused = timerStatus == TimerStatus.paused;
+    final isIdle = timerStatus == TimerStatus.idle;
 
     // Determine button label based on status
     String getButtonLabel() {
@@ -236,7 +243,7 @@ class _TimerCard extends StatelessWidget {
             label: getButtonLabel(),
             backgroundColor: isBreak
                 ? AppColors.warningColor
-                : isPaused
+                : isIdle
                 ? AppColors.primaryColor
                 : AppColors.secondaryColor,
           ),
@@ -569,21 +576,6 @@ class _RollingDigitState extends State<_RollingDigit>
   }
 
   @override
-  void didUpdateWidget(_RollingDigit old) {
-    super.didUpdateWidget(old);
-    // Only animate when the user lifts the slider (onChangeEnd),
-    // not on every drag tick. The display already shows widget.digit live
-    // via the non-animating branch; we trigger the roll only when the
-    // digit actually differs from the settled _from value.
-    if (widget.digit == _from || _animating) return;
-    final fromV = int.tryParse(_from) ?? 0;
-    final toV = int.tryParse(widget.digit) ?? 0;
-    _buildAnimations(toV >= fromV ? 1 : -1);
-    setState(() => _animating = true);
-    _ctrl.forward(from: 0);
-  }
-
-  @override
   void dispose() {
     _ctrl.dispose();
     super.dispose();
@@ -643,7 +635,6 @@ class _SessionSlider extends StatelessWidget {
     required this.ticks,
     required this.onChanged,
     required this.color,
-    this.onChangeEnd,
   });
 
   final int value;
@@ -651,7 +642,6 @@ class _SessionSlider extends StatelessWidget {
   final int max;
   final List<int> ticks;
   final ValueChanged<int> onChanged;
-  final ValueChanged<int>? onChangeEnd;
   final Color color;
 
   @override
@@ -678,9 +668,6 @@ class _SessionSlider extends StatelessWidget {
             activeColor: color,
             thumbColor: AppColors.onBackgroundColor,
             onChanged: (v) => onChanged(v.round()),
-            onChangeEnd: onChangeEnd != null
-                ? (v) => onChangeEnd!(v.round())
-                : null,
           ),
         ),
         Padding(
@@ -723,9 +710,7 @@ class _ActiveResidentsCard extends StatelessWidget {
               color: AppColors.cardSurfaceColor,
               borderRadius: BorderRadius.circular(24.r),
             ),
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: const Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -779,6 +764,7 @@ class _ActiveResidentsCard extends StatelessWidget {
                     child: _UserRow(
                       member: member,
                       localNow: state.localNow ?? DateTime.now(),
+                      isPaused: state.pausedMemberIds.contains(member.userId),
                     ),
                   ),
                 ),
@@ -794,36 +780,34 @@ class _UserRow extends StatelessWidget {
   const _UserRow({
     required this.member,
     required this.localNow,
+    required this.isPaused,
   });
 
-  final RoomMemberWithSessionModel member;
+  final RoomMemberWithSession member;
   final DateTime localNow;
+  final bool isPaused;
 
   ({String? focusDisplay, String? subLabel}) _computeDisplay() {
     if (member.sessionId == null) {
       return (
         focusDisplay: null,
-        subLabel: member.status == 'online'
-            ? 'Online'
-            : member.status == 'idle'
-            ? 'Idle'
-            : 'Offline',
+        subLabel: member.status.name.replaceFirst(
+          member.status.name[0],
+          member.status.name[0].toUpperCase(),
+        ),
       );
     }
 
-    if (member.sessionType == 'focus' && member.startedAt != null) {
+    if (member.sessionType == SessionType.focus && member.startedAt != null && !isPaused) {
       final elapsed =
           localNow.difference(member.startedAt!).inSeconds -
           (member.totalPausedSeconds ?? 0);
       final totalSeconds = member.completedFocusSeconds + elapsed;
       final display = _formatSeconds(totalSeconds);
-      return (
-        focusDisplay: '⏱️ $display',
-        subLabel: null,
-      );
+      return (focusDisplay: '⏱️ $display', subLabel: null);
     }
 
-    if (member.sessionType == 'focus' &&
+    if (member.sessionType == SessionType.focus &&
         member.pausedAt != null &&
         member.startedAt != null) {
       final elapsed =
@@ -831,24 +815,45 @@ class _UserRow extends StatelessWidget {
           (member.totalPausedSeconds ?? 0);
       final totalSeconds = member.completedFocusSeconds + elapsed;
       final display = _formatSeconds(totalSeconds);
-      return (
-        focusDisplay: '⏱️ $display',
-        subLabel: '⏸ Paused',
-      );
+      return (focusDisplay: '⏱️ $display', subLabel: '⏸ Paused');
     }
 
-    if (member.sessionType == 'breakTime' &&
+    if (member.sessionType == SessionType.breakTime &&
         member.startedAt != null &&
-        member.plannedMinutes != null) {
+        member.plannedMinutes != null &&
+        !isPaused) {
       final focusDisplay = _formatSeconds(member.completedFocusSeconds);
-      final breakRemaining = (member.plannedMinutes! * 60) -
+      final breakRemaining =
+          (member.plannedMinutes! * 60) -
           (localNow.difference(member.startedAt!).inSeconds -
               (member.totalPausedSeconds ?? 0));
-      final breakDisplay =
-          breakRemaining > 0 ? _formatSeconds(breakRemaining) : '00:00';
+      final breakDisplay = breakRemaining > 0
+          ? _formatSeconds(breakRemaining)
+          : '00:00';
       return (
         focusDisplay: '⏱️ $focusDisplay',
         subLabel: '☕ break ends in $breakDisplay',
+      );
+    }
+
+    // Paused break session
+    if (member.sessionType == SessionType.breakTime &&
+        member.startedAt != null &&
+        member.plannedMinutes != null &&
+        isPaused) {
+      final focusDisplay = _formatSeconds(member.completedFocusSeconds);
+      final pausedBreakRemaining =
+          (member.plannedMinutes! * 60) -
+          (member.pausedAt != null
+              ? member.pausedAt!.difference(member.startedAt!).inSeconds -
+                  (member.totalPausedSeconds ?? 0)
+              : 0);
+      final breakDisplay = pausedBreakRemaining > 0
+          ? _formatSeconds(pausedBreakRemaining)
+          : '00:00';
+      return (
+        focusDisplay: '⏱️ $focusDisplay',
+        subLabel: '☕ break paused: $breakDisplay remaining',
       );
     }
 
@@ -865,13 +870,16 @@ class _UserRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final display = _computeDisplay();
-    final opacity = member.status == 'offline' ? 0.5 : 1.0;
+    final opacity = member.status == MemberStatus.offline ? 0.5 : 1.0;
 
     return Opacity(
       opacity: opacity,
       child: Row(
         children: [
-          _AvatarWithStatus(statusColor: _statusColor(member.status)),
+          _AvatarWithStatus(
+            statusColor: _statusColor(member.status),
+            avatarUrl: member.avatarUrl,
+          ),
           SizedBox(width: 12.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -907,28 +915,27 @@ class _UserRow extends StatelessWidget {
     );
   }
 
-  Color _statusColor(String status) {
+  Color _statusColor(MemberStatus status) {
     switch (status) {
-      case 'online':
+      case MemberStatus.online:
         return AppColors.primaryColor;
-      case 'working':
+      case MemberStatus.working:
         return const Color(0xFF18BB4B);
-      case 'onBreak':
+      case MemberStatus.onBreak:
         return const Color(0xFFDC9624);
-      case 'idle':
+      case MemberStatus.idle:
         return const Color(0xFF2C96E5);
-      case 'offline':
-        return AppColors.textTertiaryColor;
-      default:
+      case MemberStatus.offline:
         return AppColors.textTertiaryColor;
     }
   }
 }
 
 class _AvatarWithStatus extends StatelessWidget {
-  const _AvatarWithStatus({required this.statusColor});
+  const _AvatarWithStatus({required this.statusColor, required this.avatarUrl});
 
   final Color statusColor;
+  final String? avatarUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -944,15 +951,17 @@ class _AvatarWithStatus extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.surfaceColor,
             ),
-            child: Icon(
-              Icons.person,
-              size: 20.r,
-              color: AppColors.textTertiaryColor,
-            ),
+            child: avatarUrl != null
+                ? RoomsCardAvatar(url: avatarUrl!, size: 40.r)
+                : Icon(
+                    Icons.person,
+                    size: 20.r,
+                    color: AppColors.textSecondaryColor,
+                  ),
           ),
           Positioned(
-            right: 0,
-            bottom: 0,
+            right: 3.r,
+            bottom: 3.r,
             child: Container(
               width: 12.r,
               height: 12.r,
