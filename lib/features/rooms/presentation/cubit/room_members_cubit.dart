@@ -48,26 +48,34 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
 
     result.fold(
       onSuccess: (members) {
+        final newMembers = members
+            .map((e) => RoomMemberWithSessionModel(
+                  userId: e.userId,
+                  fullName: e.fullName,
+                  avatarUrl: e.avatarUrl,
+                  status: e.status,
+                  lastCheckinAt: e.lastCheckinAt,
+                  completedFocusSeconds: e.completedFocusSeconds,
+                  sessionId: e.sessionId,
+                  sessionType: e.sessionType,
+                  startedAt: e.startedAt,
+                  plannedMinutes: e.plannedMinutes,
+                  pausedAt: e.pausedAt,
+                  totalPausedSeconds: e.totalPausedSeconds,
+                ))
+            .toList();
+
+        // Check if any member has an active (running) session
+        final hasActiveSession = newMembers.any((member) =>
+            member.sessionId != null &&
+            member.pausedAt == null);
+
         emit(
           state.copyWith(
-            members: members
-                .map((e) => RoomMemberWithSessionModel(
-                      userId: e.userId,
-                      fullName: e.fullName,
-                      avatarUrl: e.avatarUrl,
-                      status: e.status,
-                      lastCheckinAt: e.lastCheckinAt,
-                      completedFocusSeconds: e.completedFocusSeconds,
-                      sessionId: e.sessionId,
-                      sessionType: e.sessionType,
-                      startedAt: e.startedAt,
-                      plannedMinutes: e.plannedMinutes,
-                      pausedAt: e.pausedAt,
-                      totalPausedSeconds: e.totalPausedSeconds,
-                    ))
-                .toList(),
+            members: newMembers,
             isLoading: false,
             errorMessage: null,
+            localNow: hasActiveSession ? DateTime.now() : null,
           ),
         );
       },
@@ -95,13 +103,13 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
     unawaited(_fetchMembers());
   }
 
-  /// Start 1-second ticker to update localNow (only if members have active sessions)
+  /// Start 1-second ticker to update localNow only for running sessions
   void _startTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (isClosed) return;
 
-      // Only tick if at least one member has an active running session
+      // Only emit if at least one member has an active (non-paused) session
       final hasActiveSession = state.members.any((member) =>
           member.sessionId != null &&
           member.pausedAt == null);
