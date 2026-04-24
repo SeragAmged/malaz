@@ -7,6 +7,7 @@ import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
+import 'package:malaz/features/rooms/domain/entities/leaderboard_entry.dart';
 import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 import 'package:malaz/features/rooms/presentation/cubit/timer/timer_cubit.dart';
 import 'package:malaz/features/rooms/presentation/cubit/timer/timer_state.dart';
@@ -166,7 +167,9 @@ class _RoomPageState extends State<RoomPage> with WidgetsBindingObserver {
                     child: const _ActiveResidentsCard(),
                   ),
                   SizedBox(height: 24.h),
-                  const _LeaderboardCard(),
+                  BlocBuilder<RoomMembersCubit, RoomMembersState>(
+                    builder: (context, state) => _LeaderboardCard(topLeaders: state.topLeaders),
+                  ),
                 ],
               ),
             );
@@ -981,16 +984,12 @@ class _AvatarWithStatus extends StatelessWidget {
 // ─── Leaderboard Card ────────────────────────────────────────────────────────
 
 class _LeaderboardCard extends StatelessWidget {
-  const _LeaderboardCard();
+  const _LeaderboardCard({required this.topLeaders});
+
+  final List<LeaderboardEntry> topLeaders;
 
   @override
   Widget build(BuildContext context) {
-    const leaders = [
-      ('1. Alex R.', '6.5h'),
-      ('2. Jordan S.', '5.2h'),
-      ('3. Sarah L.', '4.8h'),
-    ];
-
     return Container(
       padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
@@ -1011,32 +1010,44 @@ class _LeaderboardCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 16.h),
-          ...leaders.map(
-            (entry) => Padding(
-              padding: EdgeInsets.only(bottom: 12.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    entry.$1,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      fontSize: 14.sp,
-                      color: AppColors.textPrimaryColor,
-                    ),
-                  ),
-                  Text(
-                    entry.$2,
-                    style: AppTextStyles.titleSmall.copyWith(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF99CBFF),
-                      fontFamily: AppTextStyles.manrope,
-                    ),
-                  ),
-                ],
+          if (topLeaders.isEmpty)
+            Text(
+              'No focus sessions yet',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondaryColor,
               ),
+            )
+          else
+            ...topLeaders.asMap().entries.map(
+              (entry) {
+                final index = entry.key + 1;
+                final leader = entry.value;
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '$index. ${leader.userName}',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          fontSize: 14.sp,
+                          color: AppColors.textPrimaryColor,
+                        ),
+                      ),
+                      Text(
+                        '${leader.totalFocusHours}h',
+                        style: AppTextStyles.titleSmall.copyWith(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF99CBFF),
+                          fontFamily: AppTextStyles.manrope,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          ),
         ],
       ),
     );
