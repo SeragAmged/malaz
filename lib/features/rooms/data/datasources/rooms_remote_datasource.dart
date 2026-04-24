@@ -82,9 +82,7 @@ class RoomsRemoteDataSource {
         .eq('room_id', roomId);
 
     return (data as List)
-        .map((json) => RoomMemberWithSessionModel.fromJson(
-              Map<String, dynamic>.from(json as Map),
-            ))
+        .map((json) => RoomMemberWithSessionModel.fromJson(json))
         .toList();
   }
 
@@ -96,10 +94,7 @@ class RoomsRemoteDataSource {
   /// [roomId] - ID of the room to monitor
   /// [onEvent] - Callback fired on any change (INSERT, UPDATE, DELETE)
   /// Returns: RealtimeChannel that can be unsubscribed later
-  RealtimeChannel subscribeToRoomChanges(
-    String roomId,
-    VoidCallback onEvent,
-  ) {
+  RealtimeChannel subscribeToRoomChanges(String roomId, VoidCallback onEvent) {
     final channel = supabase.channel('room_changes_$roomId');
 
     // Subscribe to room_members changes
@@ -145,5 +140,23 @@ class RoomsRemoteDataSource {
   Future<void> unsubscribeFromRoomChanges(RealtimeChannel channel) async {
     await channel.unsubscribe();
     await supabase.removeChannel(channel);
+  }
+
+  /// Fetch top 3 daily leaders for a room
+  ///
+  /// Calls the daily_room_leaderboard(room_id) RPC function which returns
+  /// the top 3 members by total focus hours completed today.
+  ///
+  /// [roomId] - ID of the room
+  /// Returns: List of leaderboard entries with user names and focus hours
+  Future<List<LeaderboardEntryModel>> getTopLeaders(String roomId) async {
+    final response = await supabase.rpc(
+      'daily_room_leaderboard',
+      params: {'v_room_id': roomId},
+    );
+
+    return (response as List)
+        .map((json) => LeaderboardEntryModel.fromJson(json))
+        .toList();
   }
 }
