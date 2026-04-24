@@ -65,6 +65,9 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
             pausedMemberIds: pausedMemberIds,
           ),
         );
+
+        // Refresh leaderboard after member data is loaded
+        unawaited(_refreshLeaderboard());
       },
       onFailure: (error, _) {
         emit(
@@ -88,6 +91,7 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
   /// Callback when a realtime event occurs
   void _onRealtimeEvent() {
     unawaited(_fetchMembers());
+    unawaited(_refreshLeaderboard());
   }
 
   /// Start 1-second ticker to update localNow only for running sessions
@@ -121,5 +125,26 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
     await _fetchMembers();
     _startRealtimeSubscription();
     _startTicker();
+  }
+
+  /// Fetch and update leaderboard data
+  Future<void> _refreshLeaderboard() async {
+    final result = await _repository.getTopLeaders(roomId);
+
+    if (isClosed) return;
+
+    result.fold(
+      onSuccess: (leaders) {
+        emit(
+          state.copyWith(
+            topLeaders: leaders,
+          ),
+        );
+      },
+      onFailure: (error, _) {
+        // Keep existing leaderboard data on error, just log it
+        // This matches the pattern of not blocking member display on error
+      },
+    );
   }
 }
