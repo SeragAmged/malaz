@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import 'package:malaz/features/rooms/domain/entities/room.dart';
 
 part 'room_model.freezed.dart';

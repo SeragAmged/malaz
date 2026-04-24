@@ -1,6 +1,10 @@
 import 'dart:async';
 
+import 'package:debouncing/debouncing.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
+import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 import 'package:malaz/features/rooms/domain/repositories/presence_repository.dart';
 import 'package:malaz/features/rooms/domain/repositories/session_repository.dart';
 
@@ -18,32 +22,33 @@ class TimerCubit extends Cubit<TimerState> {
     required this.roomId,
     required SessionRepository sessionRepository,
     required PresenceRepository presenceRepository,
-  })  : _sessionRepository = sessionRepository,
-        _presenceRepository = presenceRepository,
-        super(const TimerState());
+  }) : _sessionRepository = sessionRepository,
+       _presenceRepository = presenceRepository,
+       super(const TimerState());
 
   @override
   Future<void> close() async {
     _ticker?.cancel();
-    if (state.sessionId != null) {
-      await _sessionRepository.endSession(state.sessionId!, 'interrupted');
-    }
+    // if (state.sessionId != null) {
+    //   await _sessionRepository.endSession(state.sessionId!, 'interrupted');
+    // }
     return super.close();
   }
 
-  /// Start a new session
   Future<void> startSession() async {
     if (!state.isIdle) return;
 
     emit(state.copyWith(isLoading: true));
 
-    final sessionType = state.mode == SessionMode.focus ? 'focus' : 'breakTime';
-    final plannedMinutes = state.mode == SessionMode.focus
+    final sessionType = state.mode.name;
+    final plannedMinutes = state.isFocusMode
         ? state.focusDuration
         : state.breakDuration;
 
-    final result =
-        await _sessionRepository.startSession(sessionType, plannedMinutes);
+    final result = await _sessionRepository.startSession(
+      sessionType,
+      plannedMinutes,
+    );
 
     if (isClosed) return;
 
@@ -71,14 +76,13 @@ class TimerCubit extends Cubit<TimerState> {
     );
   }
 
-  /// Pause the ongoing session
   Future<void> pauseSession() async {
     if (!state.isRunning || state.sessionId == null) return;
 
-    _ticker?.cancel();
     emit(state.copyWith(isLoading: true));
 
     final result = await _sessionRepository.pauseSession(state.sessionId!);
+    _ticker?.cancel();
 
     if (isClosed) return;
 
@@ -103,7 +107,6 @@ class TimerCubit extends Cubit<TimerState> {
     );
   }
 
-  /// Resume a paused session
   Future<void> resumeSession() async {
     if (!state.isPaused || state.sessionId == null) return;
 
@@ -135,20 +138,25 @@ class TimerCubit extends Cubit<TimerState> {
     );
   }
 
-  /// End the current session
-  Future<void> endSession({String reason = 'interrupted'}) async {
+  Future<void> endSession({
+    String reason = 'interrupted',
+    bool reset = false,
+  }) async {
     if (state.sessionId == null) return;
 
-    _ticker?.cancel();
     emit(state.copyWith(isLoading: true));
 
-    final result = await _sessionRepository.endSession(state.sessionId!, reason);
+    final result = await _sessionRepository.endSession(
+      state.sessionId!,
+      reason,
+    );
+    _ticker?.cancel();
 
     if (isClosed) return;
 
     result.fold(
       onSuccess: (_) {
-        _flipMode();
+        if (!reset) _flipMode();
         _backgroundedAt = null;
         emit(
           state.copyWith(
@@ -171,18 +179,16 @@ class TimerCubit extends Cubit<TimerState> {
     );
   }
 
-  /// Reset the timer to idle state
   void resetSession() {
     _ticker?.cancel();
     if (state.sessionId != null) {
-      endSession(reason: 'reset');
+      endSession(reason: 'interrupted', reset: true);
     } else {
-      _resetTimer();
       emit(state.copyWith(status: TimerStatus.idle));
     }
+    _resetTimer();
   }
 
-  /// Toggle between focus and break modes
   Future<void> flipMode() async {
     if (state.sessionId != null) {
       await endSession(reason: 'interrupted');
@@ -193,7 +199,6 @@ class TimerCubit extends Cubit<TimerState> {
     }
   }
 
-  /// Update the durations for focus and break sessions
   void updateDurations({int? focusMinutes, int? breakMinutes}) {
     if (!state.isIdle) return;
 
@@ -213,24 +218,21 @@ class TimerCubit extends Cubit<TimerState> {
   /// Set user as offline
   Future<void> setOffline() async {
     if (state.isRunning) _backgroundedAt = DateTime.now();
-    // do NOT cancel ticker - it may be paused by OS but we reconcile on resume
 
-    final result = await _presenceRepository.setStatus('offline');
-
-    if (isClosed) return;
-
-    result.fold(
-      onSuccess: (_) {
-        // Status updated successfully
-      },
-      onFailure: (error, _) {
-        emit(
-          state.copyWith(
-            errorMessage: error.message ?? 'Failed to set offline status',
-          ),
-        );
-      },
-    );
+    if (!state.isRunning) {
+      final result = await _presenceRepository.setStatus(MemberStatus.offline);
+      if (isClosed) return;
+      result.fold(
+        onSuccess: (_) {},
+        onFailure: (error, _) {
+          emit(
+            state.copyWith(
+              errorMessage: error.message ?? 'Failed to set offline status',
+            ),
+          );
+        },
+      );
+    }
   }
 
   /// Set user as online
@@ -256,7 +258,11 @@ class TimerCubit extends Cubit<TimerState> {
       _backgroundedAt = null;
     }
 
-    final status = state.isRunning ? 'working' : 'online';
+    final status = state.isRunning
+        ? state.isFocusMode
+              ? MemberStatus.working
+              : MemberStatus.onBreak
+        : MemberStatus.online;
     final result = await _presenceRepository.setStatus(status);
 
     if (isClosed) return;
@@ -296,17 +302,19 @@ class TimerCubit extends Cubit<TimerState> {
         final plannedSeconds = session.plannedMinutes * 60;
         final int remaining;
 
-        if (session.status == 'paused' && session.pausedAt != null) {
+        if (session.isPaused && session.pausedAt != null) {
           // elapsed active time = (paused_at - started_at) - total_paused_seconds_before
           // total_paused_seconds already includes all previous pauses but NOT the current one
-          final totalElapsed =
-              session.pausedAt!.difference(session.startedAt).inSeconds;
+          final totalElapsed = session.pausedAt!
+              .difference(session.startedAt)
+              .inSeconds;
           final activeElapsed = totalElapsed - session.totalPausedSeconds;
           remaining = (plannedSeconds - activeElapsed).clamp(0, plannedSeconds);
         } else {
           // elapsed active time = (now - started_at) - total_paused_seconds
-          final totalElapsed =
-              DateTime.now().difference(session.startedAt).inSeconds;
+          final totalElapsed = DateTime.now()
+              .difference(session.startedAt)
+              .inSeconds;
           final activeElapsed = totalElapsed - session.totalPausedSeconds;
           remaining = (plannedSeconds - activeElapsed).clamp(0, plannedSeconds);
         }
@@ -316,22 +324,22 @@ class TimerCubit extends Cubit<TimerState> {
           return;
         }
 
-        final mode = session.sessionType == 'focus'
-            ? SessionMode.focus
-            : SessionMode.breakTime;
+        final mode = session.sessionType;
 
-        emit(state.copyWith(
-          status: session.status == 'running'
-              ? TimerStatus.running
-              : TimerStatus.paused,
-          mode: mode,
-          totalSeconds: plannedSeconds,
-          remainingSeconds: remaining,
-          sessionStartedAt: session.startedAt,
-          errorMessage: null,
-        ));
+        emit(
+          state.copyWith(
+            status: !session.isPaused
+                ? TimerStatus.running
+                : TimerStatus.paused,
+            mode: mode,
+            totalSeconds: plannedSeconds,
+            remainingSeconds: remaining,
+            sessionStartedAt: session.startedAt,
+            errorMessage: null,
+          ),
+        );
 
-        if (session.status == 'running') {
+        if (!session.isPaused) {
           _startTicker();
         }
       },
@@ -367,15 +375,16 @@ class TimerCubit extends Cubit<TimerState> {
 
   /// Toggle the session mode between focus and break
   void _flipMode() {
-    final newMode =
-        state.mode == SessionMode.focus ? SessionMode.breakTime : SessionMode.focus;
+    final newMode = state.isFocusMode
+        ? SessionType.breakTime
+        : SessionType.focus;
     emit(state.copyWith(mode: newMode));
     _resetTimer();
   }
 
   /// Reset the timer to the initial duration based on current mode
   void _resetTimer() {
-    final durationMinutes = state.mode == SessionMode.focus
+    final durationMinutes = state.mode == SessionType.focus
         ? state.focusDuration
         : state.breakDuration;
     final durationSeconds = durationMinutes * 60;

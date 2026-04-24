@@ -1,7 +1,6 @@
-/// A room member with their current active session data.
-///
-/// Contains user information, member status, completed focus time since last check-in,
-/// and their current active session if any (focus or break).
+
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
+
 class RoomMemberWithSession {
   const RoomMemberWithSession({
     required this.userId,
@@ -17,17 +16,14 @@ class RoomMemberWithSession {
     this.pausedAt,
     this.totalPausedSeconds,
   });
-
   final String userId;
   final String fullName;
   final String? avatarUrl;
-  final String status; // 'online' | 'working' | 'onBreak' | 'idle' | 'offline'
+  final MemberStatus status;
   final DateTime lastCheckinAt;
   final int completedFocusSeconds;
-
-  // Active session fields (nullable)
   final String? sessionId;
-  final String? sessionType; // 'focus' | 'breakTime'
+  final SessionType? sessionType; 
   final DateTime? startedAt;
   final int? plannedMinutes;
   final DateTime? pausedAt;

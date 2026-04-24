@@ -9,12 +9,12 @@ import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/util/errors/domain_errors.dart';
 import 'package:malaz/core/widgets/blurred_circle_decoration.dart';
 import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
-import 'package:malaz/features/rooms/presentation/widgets/create_room_modal.dart';
-import 'package:malaz/features/rooms/presentation/widgets/header.dart';
-import 'package:malaz/features/rooms/presentation/widgets/leave_room_dialog.dart';
-import 'package:malaz/features/rooms/presentation/widgets/room_card.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_state.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/create_room_modal.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/rooms_header.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/leave_room_dialog.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/room_card.dart';
 
 class RoomsPage extends StatelessWidget {
   const RoomsPage({super.key});
@@ -152,7 +152,7 @@ class _RoomsViewState extends State<_RoomsView> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Header(),
+                      const RoomsHeader(),
                       Expanded(
                         child: Center(
                           child: Text(
@@ -174,7 +174,7 @@ class _RoomsViewState extends State<_RoomsView> {
                   child: CustomScrollView(
                     controller: _scrollController,
                     slivers: [
-                      const SliverToBoxAdapter(child: Header()),
+                      const SliverToBoxAdapter(child: RoomsHeader()),
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 100.h),
                         sliver: SliverList.separated(

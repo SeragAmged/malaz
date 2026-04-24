@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
-import 'package:malaz/features/rooms/presentation/widgets/avatar.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/rooms_card_avatar.dart';
 
 class AvatarStack extends StatelessWidget {
   const AvatarStack({super.key, required this.avatars});
@@ -30,7 +30,7 @@ class AvatarStack extends StatelessWidget {
           for (int i = 0; i < display.length; i++)
             Positioned(
               left: i * (size - overlap),
-              child: Avatar(url: display[i], size: size),
+              child: RoomsCardAvatar(url: display[i], size: size),
             ),
           if (extra > 0)
             Positioned(

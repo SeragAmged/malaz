@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 abstract class AppColors {
   // Primary colors (Teal)
   static const Color primaryColor = Color(0xFF66D9CC);
@@ -10,7 +9,7 @@ abstract class AppColors {
   static const Color inversePrimaryColor = Color(0xFF006B62);
 
   // Secondary and tertiary colors
-  static const Color secondaryColor = Color(0xFFB0CCCC);
+  static const Color secondaryColor = Color(0xFF2C96E5);
   static const Color onSecondaryColor = Color(0xFF1F3536);
   static const Color secondaryContainerColor = Color(0xFF374D4D);
   static const Color onSecondaryContainerColor = Color(0xFFC8E8E8);
@@ -48,7 +47,7 @@ abstract class AppColors {
 
   // Success/Error colors
   static const Color successColor = Color(0xFF66D9CC);
-  static const Color errorColor = Color(0xFFB3261E);
+  static const Color errorColor = Color(0xFFF43639);
   static const Color onErrorColor = Color(0xFFFFFFFF);
   static const Color errorContainerColor = Color(0xFFF9DEDC);
   static const Color onErrorContainerColor = Color(0xFF410E0B);

@@ -12,11 +12,11 @@ _RoomMemberWithSessionModel _$RoomMemberWithSessionModelFromJson(
   userId: json['user_id'] as String,
   fullName: json['full_name'] as String,
   avatarUrl: json['avatar_url'] as String?,
-  status: json['status'] as String,
+  status: $enumDecode(_$MemberStatusEnumMap, json['status']),
   lastCheckinAt: DateTime.parse(json['last_checkin_at'] as String),
   completedFocusSeconds: (json['completed_focus_seconds'] as num).toInt(),
   sessionId: json['session_id'] as String?,
-  sessionType: json['session_type'] as String?,
+  sessionType: $enumDecodeNullable(_$SessionTypeEnumMap, json['session_type']),
   startedAt: json['started_at'] == null
       ? null
       : DateTime.parse(json['started_at'] as String),
@@ -33,13 +33,26 @@ Map<String, dynamic> _$RoomMemberWithSessionModelToJson(
   'user_id': instance.userId,
   'full_name': instance.fullName,
   'avatar_url': instance.avatarUrl,
-  'status': instance.status,
+  'status': _$MemberStatusEnumMap[instance.status]!,
   'last_checkin_at': instance.lastCheckinAt.toIso8601String(),
   'completed_focus_seconds': instance.completedFocusSeconds,
   'session_id': instance.sessionId,
-  'session_type': instance.sessionType,
+  'session_type': _$SessionTypeEnumMap[instance.sessionType],
   'started_at': instance.startedAt?.toIso8601String(),
   'planned_minutes': instance.plannedMinutes,
   'paused_at': instance.pausedAt?.toIso8601String(),
   'total_paused_seconds': instance.totalPausedSeconds,
+};
+
+const _$MemberStatusEnumMap = {
+  MemberStatus.online: 'online',
+  MemberStatus.working: 'working',
+  MemberStatus.onBreak: 'onBreak',
+  MemberStatus.idle: 'idle',
+  MemberStatus.offline: 'offline',
+};
+
+const _$SessionTypeEnumMap = {
+  SessionType.focus: 'focus',
+  SessionType.breakTime: 'breakTime',
 };

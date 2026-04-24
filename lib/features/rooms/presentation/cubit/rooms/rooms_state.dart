@@ -1,6 +1,6 @@
 import 'package:malaz/core/util/errors/domain_errors.dart';
 
-import '../../domain/entities/room.dart';
+import '../../../domain/entities/room.dart';
 
 enum UiStatus { initial, loading, success, failure }
 

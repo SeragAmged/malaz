@@ -193,7 +193,7 @@ abstract class AppTextStyles {
     color: AppColors.primaryColor,
   );
 
-  static TextStyle get digitStyle => TextStyle(
+  static TextStyle get digitStyle => _style(
     fontFamily: spaceGrotesk,
     fontSize: 80,
     fontWeight: FontWeight.w700,
@@ -202,9 +202,12 @@ abstract class AppTextStyles {
     height: 1,
   );
 
-  static const TextStyle timerDisplay = TextStyle(
+  static TextStyle timerDisplay = _style(
     fontSize: 72,
     fontWeight: FontWeight.w600,
     height: 1.2,
+    letterSpacing: 0,
+    color: AppColors.textPrimaryColor,
+    fontFamily: spaceGrotesk,
   );
 }

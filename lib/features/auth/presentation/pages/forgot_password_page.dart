@@ -6,7 +6,6 @@ import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/util/validators.dart';
-import 'package:malaz/features/auth/presentation/widgets/auth_branding.dart';
 import 'package:malaz/features/auth/presentation/widgets/auth_header.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/features/auth/presentation/widgets/auth_navigation_link.dart';

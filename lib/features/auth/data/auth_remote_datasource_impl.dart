@@ -65,9 +65,10 @@ class AuthRemoteDataSourceImpl {
         throw const AuthError(message: 'Failed to sign in');
       }
 
+      //TODO FIX Error
       // Fetch user profile from database
       final response = await _supabaseClient
-          .from('users')
+          .from('profiles')
           .select()
           .eq('id', user.id)
           .single();

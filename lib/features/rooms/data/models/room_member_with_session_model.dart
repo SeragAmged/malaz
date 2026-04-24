@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import '../../domain/entities/room_member_with_session.dart';
 
 part 'room_member_with_session_model.freezed.dart';
@@ -12,11 +13,11 @@ abstract class RoomMemberWithSessionModel with _$RoomMemberWithSessionModel {
     @JsonKey(name: 'user_id') required String userId,
     @JsonKey(name: 'full_name') required String fullName,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
-    required String status,
+    required MemberStatus status,
     @JsonKey(name: 'last_checkin_at') required DateTime lastCheckinAt,
     @JsonKey(name: 'completed_focus_seconds') required int completedFocusSeconds,
     @JsonKey(name: 'session_id') String? sessionId,
-    @JsonKey(name: 'session_type') String? sessionType,
+    @JsonKey(name: 'session_type') SessionType? sessionType,
     @JsonKey(name: 'started_at') DateTime? startedAt,
     @JsonKey(name: 'planned_minutes') int? plannedMinutes,
     @JsonKey(name: 'paused_at') DateTime? pausedAt,

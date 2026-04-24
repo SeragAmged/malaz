@@ -1,8 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:malaz/core/util/errors/domain_errors.dart';
 import 'package:malaz/features/rooms/domain/entities/room.dart';
-import '../../domain/rooms_repository.dart';
+import '../../../domain/repositories/rooms_repository.dart';
 import 'rooms_state.dart';
 
 @injectable
@@ -21,6 +20,7 @@ class RoomsCubit extends Cubit<RoomsState> {
     }
     emit(state.copyWith(status: UiStatus.loading));
     final result = await _repository.getRooms(1, _pageSize);
+    if (isClosed) return;
     result.fold(
       onSuccess: (rooms) => emit(
         state.copyWith(
@@ -99,15 +99,16 @@ class RoomsCubit extends Cubit<RoomsState> {
     if (state.isCreating) return;
     emit(state.copyWith(createStatus: UiStatus.loading));
 
-    if (!state.rooms.first.isMember) {
-      emit(
-        state.copyWith(
-          createStatus: UiStatus.failure,
-          createError: AlreadyInRoom(message: 'Already in room'),
-        ),
-      );
-      return;
-    }
+    //TODO fix offline check
+    // if (!state.rooms.first.isMember) {
+    //   emit(
+    //     state.copyWith(
+    //       createStatus: UiStatus.failure,
+    //       createError: AlreadyInRoom(message: 'Already in room'),
+    //     ),
+    //   );
+    //   return;
+    // }
 
     final result = await _repository.createRoom(
       name: name,
@@ -190,22 +191,23 @@ class RoomsCubit extends Cubit<RoomsState> {
   Future<void> joinRoom(String roomId, String? password) async {
     if (state.isJoining) return;
     emit(state.copyWith(joinStatus: UiStatus.loading, joinedRoomId: roomId));
+    //TODO fix offline check
 
-    final isMember = state.rooms.any(
-      (room) => room.id == roomId && room.isMember,
-    );
-    if (isMember) {
-      emit(state.copyWith(joinStatus: UiStatus.success, joinedRoomId: roomId));
-      return;
-    } else {
-      emit(
-        state.copyWith(
-          joinStatus: UiStatus.failure,
-          joinError: AlreadyInRoom(message: 'Already in room '),
-        ),
-      );
-      return;
-    }
+    // final isMember = state.rooms.any(
+    //   (room) => room.id == roomId && room.isMember,
+    // );
+    // if (isMember) {
+    //   emit(state.copyWith(joinStatus: UiStatus.success, joinedRoomId: roomId));
+    //   return;
+    // } else {
+    //   emit(
+    //     state.copyWith(
+    //       joinStatus: UiStatus.failure,
+    //       joinError: AlreadyInRoom(message: 'Already in room '),
+    //     ),
+    //   );
+    //   return;
+    // }
 
     final result = await _repository.joinRoom(
       roomId: roomId,

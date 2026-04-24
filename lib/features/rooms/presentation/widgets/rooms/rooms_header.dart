@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 
-class Header extends StatelessWidget {
-  const Header();
+class RoomsHeader extends StatelessWidget {
+  const RoomsHeader({super.key});
 
   @override
   Widget build(BuildContext context) {

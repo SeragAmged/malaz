@@ -38,15 +38,16 @@ import 'package:malaz/features/rooms/domain/repositories/presence_repository.dar
     as _i590;
 import 'package:malaz/features/rooms/domain/repositories/room_members_repository.dart'
     as _i1062;
+import 'package:malaz/features/rooms/domain/repositories/rooms_repository.dart'
+    as _i850;
 import 'package:malaz/features/rooms/domain/repositories/session_repository.dart'
     as _i23;
-import 'package:malaz/features/rooms/domain/rooms_repository.dart' as _i756;
-import 'package:malaz/features/rooms/presentation/cubit/room_members_cubit.dart'
-    as _i456;
-import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart'
-    as _i235;
-import 'package:malaz/features/rooms/presentation/cubit/timer_cubit.dart'
-    as _i4;
+import 'package:malaz/features/rooms/presentation/cubit/room_members/room_members_cubit.dart'
+    as _i728;
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_cubit.dart'
+    as _i62;
+import 'package:malaz/features/rooms/presentation/cubit/timer/timer_cubit.dart'
+    as _i185;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
@@ -78,29 +79,32 @@ extension GetItInjectableX on _i174.GetIt {
         datasource: gh<_i479.RoomsRemoteDataSource>(),
       ),
     );
+    gh.factory<_i850.RoomsRepository>(
+      () =>
+          _i1064.RoomsRepositoryImpl(remote: gh<_i479.RoomsRemoteDataSource>()),
+    );
     gh.lazySingleton<_i121.AuthRemoteDataSourceImpl>(
       () => _i121.AuthRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
+    );
+    gh.factoryParam<_i728.RoomMembersCubit, String, dynamic>(
+      (roomId, _) => registerModule.roomMembersCubit(
+        roomId,
+        gh<_i1062.RoomMembersRepository>(),
+      ),
+    );
+    gh.factory<_i62.RoomsCubit>(
+      () => _i62.RoomsCubit(gh<_i850.RoomsRepository>()),
     );
     gh.lazySingleton<_i146.AuthRepository>(
       () => _i484.AuthRepositoryImpl(gh<_i121.AuthRemoteDataSourceImpl>()),
     );
-    gh.factory<_i456.RoomMembersCubit>(
-      () => _i456.RoomMembersCubit(
-        roomId: gh<String>(),
-        repository: gh<_i1062.RoomMembersRepository>(),
-      ),
-    );
     gh.factory<_i590.PresenceRepository>(
       () => _i477.PresenceRepositoryImpl(gh<_i529.PresenceRemoteDataSource>()),
-    );
-    gh.factory<_i756.RoomsRepository>(
-      () =>
-          _i1064.RoomsRepositoryImpl(remote: gh<_i479.RoomsRemoteDataSource>()),
     );
     gh.factory<_i23.SessionRepository>(
       () => _i865.SessionRepositoryImpl(gh<_i744.SessionRemoteDataSource>()),
     );
-    gh.factoryParam<_i4.TimerCubit, String, dynamic>(
+    gh.factoryParam<_i185.TimerCubit, String, dynamic>(
       (roomId, _) => registerModule.timerCubit(
         roomId,
         gh<_i23.SessionRepository>(),
@@ -115,9 +119,6 @@ extension GetItInjectableX on _i174.GetIt {
         sharedPreferences: gh<_i460.SharedPreferences>(),
         authCubit: gh<_i281.AuthCubit>(),
       ),
-    );
-    gh.factory<_i235.RoomsCubit>(
-      () => _i235.RoomsCubit(gh<_i756.RoomsRepository>()),
     );
     return this;
   }

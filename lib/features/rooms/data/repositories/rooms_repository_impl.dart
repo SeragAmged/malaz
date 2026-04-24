@@ -2,13 +2,14 @@ import 'dart:developer' show log;
 
 import 'package:injectable/injectable.dart';
 import 'package:malaz/features/rooms/data/models/room_model.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/util/errors/domain_errors.dart';
-import '../../../core/util/result.dart';
-import '../domain/entities/room.dart';
-import '../domain/rooms_repository.dart';
-import 'rooms_remote_datasource.dart';
+import '../../../../core/util/errors/domain_errors.dart';
+import '../../../../core/util/result.dart';
+import '../../domain/entities/room.dart';
+import '../../domain/repositories/rooms_repository.dart';
+import '../datasources/rooms_remote_datasource.dart';
 
 @Injectable(as: RoomsRepository)
 class RoomsRepositoryImpl implements RoomsRepository {
@@ -58,12 +59,6 @@ class RoomsRepositoryImpl implements RoomsRepository {
   }
 
   @override
-  Future<Result<void, DomainError>> endSession(String sessionId) {
-    // TODO: implement endSession
-    throw UnimplementedError();
-  }
-
-  @override
   Future<Result<Room, DomainError>> getRoom(String id) async {
     try {
       final RoomModel newRoom = await remote.getRoom(id);
@@ -95,28 +90,6 @@ class RoomsRepositoryImpl implements RoomsRepository {
     } catch (e) {
       return Failure(SupabaseError(message: 'Failed to leave room: $e'));
     }
-  }
-
-  @override
-  Future<Result<void, DomainError>> pauseSession(String sessionId) {
-    // TODO: implement pauseSession
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Result<void, DomainError>> resumeSession(String sessionId) {
-    // TODO: implement resumeSession
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Result<void, DomainError>> startSession(
-    String roomId,
-    SessionType sessionType,
-    int planedMinutes,
-  ) {
-    // TODO: implement startSession
-    throw UnimplementedError();
   }
 
   DomainError _mapError(dynamic e) {

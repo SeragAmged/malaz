@@ -6,7 +6,6 @@ import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/util/validators.dart';
-import 'package:malaz/features/splash/splash_page.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 import '../widgets/auth_branding.dart';

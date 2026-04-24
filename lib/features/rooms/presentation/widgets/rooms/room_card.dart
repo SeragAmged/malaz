@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import 'package:malaz/features/rooms/domain/entities/room.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
-import 'package:malaz/features/rooms/presentation/widgets/avatar_stack.dart';
-import 'package:malaz/features/rooms/presentation/widgets/join_room_modal.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_state.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/avatar_stack.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/join_room_modal.dart';
 
 class RoomCard extends StatefulWidget {
   const RoomCard({super.key, required this.room});

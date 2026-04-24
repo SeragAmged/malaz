@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'dart:math' show Random;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,11 +10,11 @@ import 'package:malaz/core/util/errors/domain_errors.dart';
 import 'package:malaz/core/util/validators.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/core/widgets/app_text_field.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
-import 'package:malaz/features/rooms/presentation/widgets/add_type_modal.dart';
-import 'package:malaz/features/rooms/presentation/widgets/leave_room_dialog.dart';
-import 'package:malaz/features/rooms/presentation/widgets/room_type_chip.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_state.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/add_type_modal.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/leave_room_dialog.dart';
+import 'package:malaz/features/rooms/presentation/widgets/rooms/room_type_chip.dart';
 
 class CreateRoomModal extends StatefulWidget {
   const CreateRoomModal({super.key});

@@ -1,44 +1,34 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
+
 import '../../domain/entities/active_session.dart';
 
-class ActiveSessionModel {
-  const ActiveSessionModel({
-    required this.sessionId,
-    required this.sessionType,
-    required this.startedAt,
-    required this.plannedMinutes,
-    required this.status,
-    required this.totalPausedSeconds,
-    this.pausedAt,
-  });
+part 'active_session_model.freezed.dart';
+part 'active_session_model.g.dart';
 
-  final String sessionId;
-  final String sessionType;
-  final DateTime startedAt;
-  final int plannedMinutes;
-  final String status;
-  final int totalPausedSeconds;
-  final DateTime? pausedAt;
+@freezed
+abstract class ActiveSessionModel with _$ActiveSessionModel {
+  const ActiveSessionModel._();
 
-  factory ActiveSessionModel.fromJson(Map<String, dynamic> json) {
-    return ActiveSessionModel(
-      sessionId: json['session_id'] as String,
-      sessionType: json['session_type'] as String,
-      startedAt: DateTime.parse(json['started_at'] as String),
-      plannedMinutes: json['planned_minutes'] as int,
-      status: json['status'] as String,
-      totalPausedSeconds: json['total_paused_seconds'] as int? ?? 0,
-      pausedAt: json['paused_at'] != null
-          ? DateTime.parse(json['paused_at'] as String)
-          : null,
-    );
-  }
+  const factory ActiveSessionModel({
+    @JsonKey(name: "session_id") required String sessionId,
+    @JsonKey(name: "session_type") required SessionType sessionType,
+    @JsonKey(name: "started_at") required DateTime startedAt,
+    @JsonKey(name: "planned_minutes") required int plannedMinutes,
+    // @JsonKey(name: "status") required String status,
+    @JsonKey(name: "total_paused_seconds") required int totalPausedSeconds,
+    @JsonKey(name: "paused_at") DateTime? pausedAt,
+  }) = _ActiveSessionModel;
+
+  factory ActiveSessionModel.fromJson(Map<String, dynamic> json) =>
+      _$ActiveSessionModelFromJson(json);
 
   ActiveSession toEntity() => ActiveSession(
     sessionId: sessionId,
     sessionType: sessionType,
     startedAt: startedAt,
     plannedMinutes: plannedMinutes,
-    status: status,
+    // status: status,
     totalPausedSeconds: totalPausedSeconds,
     pausedAt: pausedAt,
   );

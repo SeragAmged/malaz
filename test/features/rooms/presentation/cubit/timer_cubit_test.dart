@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
+import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:malaz/core/util/errors/domain_errors.dart';
 import 'package:malaz/core/util/result.dart';
 import 'package:malaz/features/rooms/domain/repositories/presence_repository.dart';
 import 'package:malaz/features/rooms/domain/repositories/session_repository.dart';
-import 'package:malaz/features/rooms/presentation/cubit/timer_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/timer_state.dart';
+import 'package:malaz/features/rooms/presentation/cubit/timer/timer_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/timer/timer_state.dart';
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
@@ -41,7 +43,7 @@ void main() {
     group('Initialization', () {
       test('initial state is idle with focus mode, 25 min, no session', () {
         expect(timerCubit.state.status, TimerStatus.idle);
-        expect(timerCubit.state.mode, SessionMode.focus);
+        expect(timerCubit.state.mode, SessionType.focus);
         expect(timerCubit.state.focusDuration, 25);
         expect(timerCubit.state.breakDuration, 5);
         expect(timerCubit.state.sessionId, isNull);
@@ -260,25 +262,25 @@ void main() {
     group('flipMode()', () {
       test('toggles mode from focus to breakTime when idle', () async {
         // Arrange
-        expect(timerCubit.state.mode, SessionMode.focus);
+        expect(timerCubit.state.mode, SessionType.focus);
 
         // Act
         await timerCubit.flipMode();
 
         // Assert
-        expect(timerCubit.state.mode, SessionMode.breakTime);
+        expect(timerCubit.state.mode, SessionType.breakTime);
       });
 
       test('toggles mode from breakTime to focus when idle', () async {
         // Arrange
         await timerCubit.flipMode();
-        expect(timerCubit.state.mode, SessionMode.breakTime);
+        expect(timerCubit.state.mode, SessionType.breakTime);
 
         // Act
         await timerCubit.flipMode();
 
         // Assert
-        expect(timerCubit.state.mode, SessionMode.focus);
+        expect(timerCubit.state.mode, SessionType.focus);
       });
 
       test('resets timer to 5:00 for break mode', () async {
@@ -286,7 +288,7 @@ void main() {
         await timerCubit.flipMode(); // Switch to breakTime
 
         // Assert
-        expect(timerCubit.state.mode, SessionMode.breakTime);
+        expect(timerCubit.state.mode, SessionType.breakTime);
         expect(timerCubit.state.totalSeconds, 300); // 5 minutes
         expect(timerCubit.state.remainingSeconds, 300);
       });
@@ -297,7 +299,7 @@ void main() {
         await timerCubit.flipMode(); // Switch back to focus
 
         // Assert
-        expect(timerCubit.state.mode, SessionMode.focus);
+        expect(timerCubit.state.mode, SessionType.focus);
         expect(timerCubit.state.totalSeconds, 1500); // 25 minutes
         expect(timerCubit.state.remainingSeconds, 1500);
       });
@@ -433,20 +435,20 @@ void main() {
     group('setOffline()', () {
       test('calls presence repository setStatus with offline', () async {
         // Arrange
-        when(() => mockPresenceRepository.setStatus('offline'))
+        when(() => mockPresenceRepository.setStatus(MemberStatus.offline))
             .thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.setOffline();
 
         // Assert
-        verify(() => mockPresenceRepository.setStatus('offline')).called(1);
+        verify(() => mockPresenceRepository.setStatus(MemberStatus.offline)).called(1);
       });
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to set offline status';
-        when(() => mockPresenceRepository.setStatus('offline'))
+        when(() => mockPresenceRepository.setStatus(MemberStatus.offline))
             .thenAnswer((_) async => Failure(
               NetworkError(message: errorMessage),
             ));
@@ -462,21 +464,21 @@ void main() {
     group('setOnline()', () {
       test('calls presence repository setStatus with online when idle', () async {
         // Arrange
-        when(() => mockPresenceRepository.setStatus('online'))
+        when(() => mockPresenceRepository.setStatus(MemberStatus.online))
             .thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.setOnline();
 
         // Assert
-        verify(() => mockPresenceRepository.setStatus('online')).called(1);
+        verify(() => mockPresenceRepository.setStatus(MemberStatus.online)).called(1);
       });
 
       test('calls presence repository setStatus with working when running', () async {
         // Arrange
         when(() => mockSessionRepository.startSession('focus', 25))
             .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockPresenceRepository.setStatus('working'))
+        when(() => mockPresenceRepository.setStatus(MemberStatus.working))
             .thenAnswer((_) async => const Success(null));
 
         await timerCubit.startSession();
@@ -485,13 +487,13 @@ void main() {
         await timerCubit.setOnline();
 
         // Assert
-        verify(() => mockPresenceRepository.setStatus('working')).called(1);
+        verify(() => mockPresenceRepository.setStatus(MemberStatus.working)).called(1);
       });
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to set online status';
-        when(() => mockPresenceRepository.setStatus('online'))
+        when(() => mockPresenceRepository.setStatus(MemberStatus.online))
             .thenAnswer((_) async => Failure(
               NetworkError(message: errorMessage),
             ));
@@ -548,14 +550,14 @@ void main() {
         when(() => mockSessionRepository.endSession('session-123', 'completed'))
             .thenAnswer((_) async => const Success(null));
 
-        expect(timerCubit.state.mode, SessionMode.focus);
+        expect(timerCubit.state.mode, SessionType.focus);
         await timerCubit.startSession();
 
         // Act
         await timerCubit.endSession(reason: 'completed');
 
         // Assert
-        expect(timerCubit.state.mode, SessionMode.breakTime);
+        expect(timerCubit.state.mode, SessionType.breakTime);
       });
 
       test('does nothing if sessionId is null', () async {
@@ -652,13 +654,13 @@ void main() {
         await timerCubit.flipMode();
 
         // Assert
-        expect(timerCubit.state.mode, SessionMode.breakTime);
+        expect(timerCubit.state.mode, SessionType.breakTime);
         expect(timerCubit.state.totalSeconds, 300); // 5 minutes
       });
 
       test('focus mode has correct duration', () {
         // Assert
-        expect(timerCubit.state.mode, SessionMode.focus);
+        expect(timerCubit.state.mode, SessionType.focus);
         expect(timerCubit.state.totalSeconds, 1500); // 25 minutes
       });
 

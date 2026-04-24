@@ -1,4 +1,5 @@
-enum SessionType { focus, breakTime }
+
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
 
 class Room {
   const Room({

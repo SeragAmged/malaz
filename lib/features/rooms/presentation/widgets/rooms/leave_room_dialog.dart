@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_cubit.dart';
-import 'package:malaz/features/rooms/presentation/cubit/rooms_state.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_cubit.dart';
+import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_state.dart';
 
 class LeaveRoomDialog extends StatelessWidget {
   const LeaveRoomDialog({super.key});

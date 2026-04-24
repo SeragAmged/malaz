@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -39,10 +41,12 @@ class SessionRemoteDataSource {
   /// [sessionId] - ID of the session to end
   /// [reason] - reason for ending ('completed', 'interrupted', 'abandoned')
   Future<void> endSession(String sessionId, String reason) async {
+    // return;
     await supabase.rpc(
       'end_session',
       params: {'p_session_id': sessionId, 'p_ended_reason': reason},
     );
+    log('endSession response: Session $sessionId ended with reason: $reason');
   }
 
   /// Fetch the current user's active session from the view
@@ -51,7 +55,8 @@ class SessionRemoteDataSource {
         .from('active_session_view')
         .select()
         .maybeSingle();
+    log('getActiveSession response: $response');
     if (response == null) return null;
-    return ActiveSessionModel.fromJson(Map<String, dynamic>.from(response));
+    return ActiveSessionModel.fromJson(response);
   }
 }

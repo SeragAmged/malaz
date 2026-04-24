@@ -7,7 +7,7 @@ import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:malaz/features/auth/presentation/pages/signin_page.dart';
 import 'package:malaz/features/auth/presentation/pages/signup_page.dart';
 import 'package:malaz/features/layout/layout_page.dart';
-import 'package:malaz/features/rooms/presentation/pages/room_screen.dart';
+import 'package:malaz/features/rooms/presentation/pages/room_page.dart';
 import 'package:malaz/features/rooms/presentation/pages/rooms_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -134,7 +134,7 @@ class AppRouter {
                   GoRoute(
                     path: ':id',
                     builder: (context, state) =>
-                        RoomScreen(roomId: state.pathParameters['id']!),
+                        RoomPage(roomId: state.pathParameters['id']!),
                   ),
                 ],
               ),
