@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:malaz/features/auth/data/auth_remote_datasource_impl.dart';
 import 'package:malaz/features/auth/domain/entities/auth_state_event.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 
 import '../../../core/util/result.dart';
 import '../../../core/util/errors/domain_errors.dart';
@@ -128,6 +129,39 @@ class AuthRepositoryImpl implements AuthRepository {
       return Failure(e);
     } catch (e) {
       return Failure(AvatarLoadError(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Result<User, DomainError>> updateUserProfile({
+    String? fullName,
+    String? avatarUrl,
+  }) async {
+    try {
+      final supabaseClient = supabase.Supabase.instance.client;
+      final response = await supabaseClient.rpc(
+        'update_user_profile',
+        params: {
+          'full_name': fullName,
+          'avatar_url': avatarUrl,
+        },
+      ) as Map<String, dynamic>;
+
+      final user = User(
+        id: response['id'] ?? '',
+        email: response['email'] ?? '',
+        fullName: response['full_name'],
+        avatarUrl: response['avatar_url'],
+        createdAt: response['created_at'] != null
+            ? DateTime.parse(response['created_at'])
+            : DateTime.now(),
+      );
+
+      return Success(user);
+    } on supabase.AuthException catch (e) {
+      return Failure(AuthError(message: e.message));
+    } catch (e) {
+      return Failure(UnknownError(message: e.toString()));
     }
   }
 }
