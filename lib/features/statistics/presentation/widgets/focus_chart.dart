@@ -12,56 +12,32 @@ class FocusChart extends StatelessWidget {
   final List<FocusActivity> activities;
   final StatsPeriod period;
 
-  /// Group activities by date (weekly) or return as-is (monthly)
-  List<FocusActivity> _processActivities() {
-    if (activities.isEmpty) return [];
-
-    // For monthly, don't group - show each date as-is
-    if (period == StatsPeriod.month) {
-      final sorted = [...activities]..sort((a, b) => a.date.compareTo(b.date));
-      return sorted;
-    }
-
-    // For weekly, group by date and sum minutes
-    final Map<DateTime, double> grouped = {};
-    for (final a in activities) {
-      final dateOnly = DateTime(a.date.year, a.date.month, a.date.day);
-      grouped[dateOnly] = (grouped[dateOnly] ?? 0) + a.totalFocusMinutes;
-    }
-
-    final sorted = grouped.entries.toList()
-      ..sort((a, b) => a.key.compareTo(b.key));
-
-    return sorted
-        .map((e) => FocusActivity(date: e.key, totalFocusMinutes: e.value))
-        .toList();
-  }
-
   String _label(FocusActivity a, int index) {
     if (period == StatsPeriod.week) {
       const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       return days[a.date.weekday - 1];
     } else {
-      return '${a.date.day}';
+      return '${a.date.day}/${a.date.month}';
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final grouped = _processActivities();
-    final maxY = grouped.isEmpty
-        ? 100.0
-        : grouped
-              .map((e) => e.totalFocusMinutes)
-              .reduce((a, b) => a > b ? a : b);
-    final yMax = (maxY * 1.3).ceilToDouble();
+    final yMax =
+        (activities.isEmpty
+                ? 100.0
+                : activities
+                          .map((e) => e.totalFocusMinutes)
+                          .reduce((a, b) => a > b ? a : b) *
+                      1.3)
+            .ceilToDouble();
 
     return SizedBox(
       height: 220.h,
       child: LineChart(
         LineChartData(
           minX: 0,
-          maxX: (grouped.length - 1).toDouble().clamp(0, double.infinity),
+          maxX: (activities.length - 1).toDouble().clamp(0, double.infinity),
           minY: 0,
           maxY: yMax,
           gridData: FlGridData(
@@ -90,10 +66,7 @@ class FocusChart extends StatelessWidget {
                   if (value == 0) return const SizedBox.shrink();
                   return Text(
                     '${value.toInt()}',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.manrope,
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w700,
+                    style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.textSecondaryColor,
                     ),
                   );
@@ -106,16 +79,12 @@ class FocusChart extends StatelessWidget {
                 reservedSize: 22.h,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
-                  if (index < 0 || index >= grouped.length) {
+                  if (index < 0 || index >= activities.length) {
                     return const SizedBox.shrink();
                   }
                   return Text(
-                    _label(grouped[index], index).toUpperCase(),
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.manrope,
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1,
+                    _label(activities[index], index).toUpperCase(),
+                    style: AppTextStyles.cardTagMedium.copyWith(
                       color: AppColors.textSecondaryColor,
                     ),
                   );
@@ -130,10 +99,7 @@ class FocusChart extends StatelessWidget {
                   .map(
                     (s) => LineTooltipItem(
                       '${s.y.toStringAsFixed(0)}m',
-                      TextStyle(
-                        fontFamily: AppTextStyles.manrope,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w700,
+                      AppTextStyles.labelLarge.copyWith(
                         color: AppColors.primaryColor,
                       ),
                     ),
@@ -144,8 +110,8 @@ class FocusChart extends StatelessWidget {
           lineBarsData: [
             LineChartBarData(
               spots: List.generate(
-                grouped.length,
-                (i) => FlSpot(i.toDouble(), grouped[i].totalFocusMinutes),
+                activities.length,
+                (i) => FlSpot(i.toDouble(), activities[i].totalFocusMinutes),
               ),
               isCurved: true,
               curveSmoothness: 0.35,

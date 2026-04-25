@@ -55,10 +55,7 @@ class SessionSlider extends StatelessWidget {
                 .map(
                   (t) => Text(
                     '$t',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.manrope,
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w700,
+                    style: AppTextStyles.labelSmall.copyWith(
                       color: AppColors.textSecondaryColor.withAlpha(100),
                     ),
                   ),

@@ -39,11 +39,7 @@ class StatCard extends StatelessWidget {
             children: [
               Text(
                 label.toUpperCase(),
-                style: TextStyle(
-                  fontFamily: AppTextStyles.manrope,
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
+                style: AppTextStyles.cardTagMedium.copyWith(
                   color: AppColors.textSecondaryColor,
                 ),
               ),
@@ -55,21 +51,12 @@ class StatCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: TextStyle(
-                  fontFamily: AppTextStyles.spaceGrotesk,
-                  fontSize: 36.sp,
-                  fontWeight: FontWeight.w700,
-                  height: 1.1,
-                  color: AppColors.textPrimaryColor,
-                ),
+                style: AppTextStyles.displaySmall,
               ),
               SizedBox(height: 4.h),
               Text(
                 subtitle,
-                style: TextStyle(
-                  fontFamily: AppTextStyles.manrope,
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
+                style: AppTextStyles.bodySmall.copyWith(
                   color: subtitleColor ?? AppColors.textSecondaryColor,
                 ),
               ),

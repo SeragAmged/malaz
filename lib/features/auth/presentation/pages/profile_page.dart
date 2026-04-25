@@ -83,7 +83,9 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.primaryColor),
+              style: AppTextStyles.labelLarge.copyWith(
+                color: AppColors.primaryColor,
+              ),
             ),
           ),
           TextButton(
@@ -93,7 +95,9 @@ class _ProfilePageState extends State<ProfilePage> {
             },
             child: Text(
               'Logout',
-              style: TextStyle(color: AppColors.errorColor),
+              style: AppTextStyles.labelLarge.copyWith(
+                color: AppColors.errorColor,
+              ),
             ),
           ),
         ],
@@ -282,10 +286,8 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: state.isLoading ? null : _handleLogout,
             child: Text(
               'LOGOUT',
-              style: TextStyle(
+              style: AppTextStyles.labelLarge.copyWith(
                 color: AppColors.errorColor.withOpacity(.8),
-                fontWeight: FontWeight.bold,
-                fontSize: 14.sp,
               ),
             ),
           ),

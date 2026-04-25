@@ -11,15 +11,6 @@ class StatisticsCubit extends Cubit<StatisticsState> {
   final StatisticsRepository _repository;
 
   Future<void> fetchStats({bool forceRefresh = false}) async {
-    if (state.isLoading) return;
-    emit(
-      state.copyWith(
-        status: UiStatus.loading,
-        weeklyActivity: [],
-        monthlyActivity: [],
-      ),
-    );
-
     final (
       totalResult,
       sessionsResult,
@@ -36,16 +27,84 @@ class StatisticsCubit extends Cubit<StatisticsState> {
 
     if (isClosed) return;
 
-    emit(
-      state.copyWith(
-        status: UiStatus.success,
-        sessionsStats: sessionsResult.dataOrNull ?? 0,
-        avgDurationStats: avgResult.dataOrNull ?? 0,
-        totalFocusTime: totalResult.dataOrNull,
-        weeklyActivity: weeklyResult.dataOrNull ?? [],
-        monthlyActivity: monthlyResult.dataOrNull ?? [],
-      ),
+    var newState = state;
+
+    totalResult.fold(
+      onSuccess: (data) {
+        newState = newState.copyWith(
+          totalFocusTime: data,
+          totalFocusTimeStatus: RequestStatus.success,
+        );
+      },
+      onFailure: (error, data) {
+        newState = newState.copyWith(
+          totalFocusTimeStatus: RequestStatus.failure,
+          errorMessage: error.message,
+        );
+      },
     );
+
+    sessionsResult.fold(
+      onSuccess: (data) {
+        newState = newState.copyWith(
+          sessionsStats: data,
+          sessionsStatsStatus: RequestStatus.success,
+        );
+      },
+      onFailure: (error, data) {
+        newState = newState.copyWith(
+          sessionsStatsStatus: RequestStatus.failure,
+          errorMessage: error.message,
+        );
+      },
+    );
+
+    avgResult.fold(
+      onSuccess: (data) {
+        newState = newState.copyWith(
+          avgDurationStats: data,
+          avgDurationStatsStatus: RequestStatus.success,
+        );
+      },
+      onFailure: (error, data) {
+        newState = newState.copyWith(
+          avgDurationStatsStatus: RequestStatus.failure,
+          errorMessage: error.message,
+        );
+      },
+    );
+
+    weeklyResult.fold(
+      onSuccess: (data) {
+        newState = newState.copyWith(
+          weeklyActivity: data,
+          weeklyActivityStatus: RequestStatus.success,
+        );
+      },
+      onFailure: (error, data) {
+        newState = newState.copyWith(
+          weeklyActivityStatus: RequestStatus.failure,
+          errorMessage: error.message,
+        );
+      },
+    );
+
+    monthlyResult.fold(
+      onSuccess: (data) {
+        newState = newState.copyWith(
+          monthlyActivity: data,
+          monthlyActivityStatus: RequestStatus.success,
+        );
+      },
+      onFailure: (error, data) {
+        newState = newState.copyWith(
+          monthlyActivityStatus: RequestStatus.failure,
+          errorMessage: error.message,
+        );
+      },
+    );
+
+    emit(newState.copyWith(status: UiStatus.success));
   }
 
   void selectPeriod(StatsPeriod period) {

@@ -12,7 +12,7 @@ class StatisticsRemoteDataSource {
 
   final SupabaseClient client;
 
-  Future<List<FocusActivityModel>> getWeeklyActivity() async {
+  Future<List<FocusActivityModel>?> getWeeklyActivity() async {
     final response = await client.rpc('get_daily_focus_this_week');
     log('Raw response from get_daily_focus_this_week: $response');
     return (response as List)
@@ -20,7 +20,7 @@ class StatisticsRemoteDataSource {
         .toList();
   }
 
-  Future<List<FocusActivityModel>> getMonthlyActivity() async {
+  Future<List<FocusActivityModel>?> getMonthlyActivity() async {
     final response = await client.rpc('get_daily_focus_this_month');
     log('Raw response from get_monthly_focus_activity: $response');
     return (response as List)
@@ -28,7 +28,7 @@ class StatisticsRemoteDataSource {
         .toList();
   }
 
-  Future<TotalFocusTimeModel> getTotalFocusTime() async {
+  Future<TotalFocusTimeModel?> getTotalFocusTime() async {
     final response = await client
         .from('focus_week_stats')
         .select('*')
@@ -38,13 +38,13 @@ class StatisticsRemoteDataSource {
     return TotalFocusTimeModel.fromJson(response);
   }
 
-  Future<int> getTotalSessionsCount() async {
+  Future<int?> getTotalSessionsCount() async {
     final response = await client.rpc('get_total_focus_sessions_this_week');
-    return response as int;
+    return response as int?;
   }
 
-  Future<double> getSessionsAvgDurationMinutes() async {
+  Future<double?> getSessionsAvgDurationMinutes() async {
     final response = await client.rpc('get_avg_focus_duration_this_week');
-    return response as double;
+    return response as double?;
   }
 }

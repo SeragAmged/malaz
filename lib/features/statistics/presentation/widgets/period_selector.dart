@@ -66,11 +66,7 @@ class _Tab extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontFamily: AppTextStyles.manrope,
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
+          style: AppTextStyles.labelMedium.copyWith(
             color: isSelected
                 ? AppColors.onPrimaryColor
                 : AppColors.textSecondaryColor,

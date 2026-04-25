@@ -89,23 +89,12 @@ class _StatisticsView extends StatelessWidget {
       children: [
         Text(
           'Your Productivity',
-          style: TextStyle(
-            fontFamily: AppTextStyles.spaceGrotesk,
-            fontSize: 36.sp,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.9,
-            height: 1.1,
-            color: AppColors.textPrimaryColor,
-          ),
+          style: AppTextStyles.displaySmall,
         ),
         SizedBox(height: 8.h),
         Text(
           'Deep work insights for this week.',
-          style: TextStyle(
-            fontFamily: AppTextStyles.manrope,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w400,
-            height: 1.55,
+          style: AppTextStyles.bodyLarge.copyWith(
             color: AppColors.textSecondaryColor,
           ),
         ),
@@ -181,21 +170,12 @@ class _ChartSection extends StatelessWidget {
         children: [
           Text(
             'Focus Activity',
-            style: TextStyle(
-              fontFamily: AppTextStyles.spaceGrotesk,
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w700,
-              height: 1.33,
-              color: AppColors.textPrimaryColor,
-            ),
+            style: AppTextStyles.headlineSmall,
           ),
           SizedBox(height: 2.h),
           Text(
             'Hours spent in deep work per day',
-            style: TextStyle(
-              fontFamily: AppTextStyles.manrope,
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w400,
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textSecondaryColor,
             ),
           ),

@@ -19,7 +19,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   Future<Result<TotalFocusTime, DomainError>> getTotalFocusTimeMinutes() async {
     try {
       final model = await remote.getTotalFocusTime();
-      return Success(model.toEntity());
+      return Success(model?.toEntity()?? TotalFocusTime(totalFocusMinutes: 0, lastWeekPercentageDiff: 0));
     } catch (e) {
       return Failure(SupabaseError(message: 'get_total_focus_time failed: $e'));
     }
@@ -29,7 +29,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   Future<Result<int, DomainError>> getTotalSessionsCount() async {
     try {
       final model = await remote.getTotalSessionsCount();
-      return Success(model);
+      return Success(model ?? 0);
     } catch (e) {
       return Failure(
         SupabaseError(message: 'get_total_sessions_count failed: $e'),
@@ -41,7 +41,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   Future<Result<double, DomainError>> getSessionsAvgDurationMinutes() async {
     try {
       final res = await remote.getSessionsAvgDurationMinutes();
-      return Success(res);
+      return Success(res ?? 0.0);
     } catch (e) {
       return Failure(
         SupabaseError(message: 'get_avg_duration_stats failed: $e'),
@@ -53,7 +53,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   Future<Result<List<FocusActivity>, DomainError>> getWeeklyActivity() async {
     try {
       final models = await remote.getWeeklyActivity();
-      return Success(models.map((m) => m.toEntity()).toList());
+      return Success(models?.map((m) => m.toEntity()).toList() ?? []);
     } catch (e) {
       log('Error in getWeeklyActivity: $e');
       return Failure(
@@ -66,7 +66,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   Future<Result<List<FocusActivity>, DomainError>> getMonthlyActivity() async {
     try {
       final models = await remote.getMonthlyActivity();
-      return Success(models.map((m) => m.toEntity()).toList());
+      return Success(models?.map((m) => m.toEntity()).toList() ?? []);
     } catch (e) {
       return Failure(
         SupabaseError(message: 'get_monthly_focus_activity failed: $e'),
