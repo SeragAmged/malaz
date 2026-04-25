@@ -32,4 +32,9 @@ abstract class AuthRepository {
   });
 
   Future<Result<List<String>, DomainError>> loadAvatarUrls();
+
+  Future<Result<User, DomainError>> updateUserProfile({
+    String? fullName,
+    String? avatarUrl,
+  });
 }
