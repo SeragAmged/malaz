@@ -1,4 +1,4 @@
-name: Build & Release APK
+name: Build & Keep Latest Release
 
 on:
   push:
@@ -25,11 +25,20 @@ jobs:
 
       - run: flutter build apk --release
 
+      # 🧹 Delete all previous releases
+      - name: Delete old releases
+        uses: dev-drprasad/delete-older-releases@v0.3.3
+        with:
+          keep_latest: 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 🚀 Create new release
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}
-          name: Release v${{ github.run_number }}
+          tag_name: latest
+          name: Latest Build
           files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
