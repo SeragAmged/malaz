@@ -205,4 +205,38 @@ class AuthCubit extends Cubit<AuthState> {
       emit(state.copyWith(selectedAvatarIndex: index));
     }
   }
+
+  Future<void> updateUserProfile({
+    String? fullName,
+    String? avatarUrl,
+  }) async {
+    emit(state.copyWith(uiState: UiState.loading, user: state.user));
+
+    final result = await _repository.updateUserProfile(
+      fullName: fullName,
+      avatarUrl: avatarUrl,
+    );
+
+    result.fold(
+      onFailure: (error, _) {
+        emit(state.copyWith(
+          uiState: UiState.initial,
+          errorMessage: error.message ?? 'Failed to update profile',
+          user: state.user,
+        ));
+      },
+      onSuccess: (updatedUser) {
+        emit(state.copyWith(
+          uiState: UiState.success,
+          user: updatedUser,
+          errorMessage: null,
+        ));
+        // Reset to initial after brief success state
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (isClosed) return;
+          emit(state.copyWith(uiState: UiState.initial));
+        });
+      },
+    );
+  }
 }
