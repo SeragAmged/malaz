@@ -22,7 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController _nameController;
   late GlobalKey<FormState> _formKey;
   late String _originalName;
-  late int _originalAvatarIndex;
+  int _originalAvatarIndex = 0;
 
   @override
   void initState() {
@@ -34,30 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _originalName = currentUser?.fullName ?? '';
     _nameController = TextEditingController(text: _originalName);
 
-    // Load avatars if not already loaded
     if (authCubit.state.avatarUrls.isEmpty) {
       authCubit.loadAvatarUrls();
-    } else {
-      // Set the selected avatar to match the current user's avatar
-      _setCurrentAvatarIndex();
-    }
-  }
-
-  void _setCurrentAvatarIndex() {
-    final authCubit = context.read<AuthCubit>();
-    final currentUser = authCubit.state.user;
-    final avatarUrls = authCubit.state.avatarUrls;
-
-    if (currentUser?.avatarUrl != null && avatarUrls.isNotEmpty) {
-      final index = avatarUrls.indexOf(currentUser!.avatarUrl!);
-      if (index != -1) {
-        _originalAvatarIndex = index;
-        authCubit.selectAvatar(index);
-      } else {
-        _originalAvatarIndex = 0;
-      }
-    } else {
-      _originalAvatarIndex = 0;
     }
   }
 
@@ -72,7 +50,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final currentName = _nameController.text;
     final currentAvatarIndex = authCubit.state.selectedAvatarIndex;
 
-    return currentName != _originalName || currentAvatarIndex != _originalAvatarIndex;
+    return currentName != _originalName ||
+        currentAvatarIndex != _originalAvatarIndex;
   }
 
   void _handleSave() {
@@ -83,10 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ? authCubit.state.avatarUrls[authCubit.state.selectedAvatarIndex]
           : null;
 
-      authCubit.updateUserProfile(
-        fullName: newName,
-        avatarUrl: newAvatarUrl,
-      );
+      authCubit.updateUserProfile(fullName: newName, avatarUrl: newAvatarUrl);
     }
   }
 
@@ -95,10 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppColors.surfaceContainerColor,
-        title: Text(
-          'Logout',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        title: Text('Logout', style: Theme.of(context).textTheme.titleLarge),
         content: Text(
           'Are you sure you want to logout?',
           style: Theme.of(context).textTheme.bodyMedium,
@@ -175,10 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: AppColors.backgroundColor,
             body: SafeArea(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 24.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -247,9 +217,9 @@ class _ProfilePageState extends State<ProfilePage> {
         // Email
         Text(
           user.email,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondaryColor,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondaryColor),
           textAlign: TextAlign.center,
         ),
       ],
@@ -258,7 +228,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildEditForm(AuthState state) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      // crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Avatar Selector
         BlocBuilder<AuthCubit, AuthState>(
@@ -267,9 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
               return SizedBox(
                 height: 32.h,
                 width: 32.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.w,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2.w),
               );
             }
 
@@ -297,30 +265,25 @@ class _ProfilePageState extends State<ProfilePage> {
         // Save Button
         AppLoadingButton(
           label: 'SAVE CHANGES',
-          onPressed: (_checkIfChanged() && !state.isLoading) ? _handleSave : () {},
+          onPressed: (_checkIfChanged() && !state.isLoading)
+              ? _handleSave
+              : () {},
           isLoading: state.isLoading,
         ),
         SizedBox(height: 32.h),
 
         // Logout Button
-        OutlinedButton(
-          onPressed: state.isLoading ? null : _handleLogout,
-          style: OutlinedButton.styleFrom(
-            side: BorderSide(
-              color: AppColors.errorColor,
-              width: 1.5,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            padding: EdgeInsets.symmetric(vertical: 16.h),
-          ),
-          child: Text(
-            'LOGOUT',
-            style: TextStyle(
-              color: AppColors.errorColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 14.sp,
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: state.isLoading ? null : _handleLogout,
+            child: Text(
+              'LOGOUT',
+              style: TextStyle(
+                color: AppColors.errorColor.withOpacity(.8),
+                fontWeight: FontWeight.bold,
+                fontSize: 14.sp,
+              ),
             ),
           ),
         ),
