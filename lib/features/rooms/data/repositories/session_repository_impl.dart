@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:malaz/features/rooms/domain/entities/enums.dart';
 
 import '../../../../core/util/errors/domain_errors.dart';
 import '../../../../core/util/result.dart';
@@ -50,7 +51,7 @@ class SessionRepositoryImpl implements SessionRepository {
   @override
   Future<Result<void, DomainError>> endSession(
     String sessionId,
-    String reason,
+    SessionEndReason reason,
   ) async {
     try {
       await _dataSource.endSession(sessionId, reason);

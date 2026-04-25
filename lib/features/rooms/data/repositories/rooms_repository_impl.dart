@@ -2,7 +2,6 @@ import 'dart:developer' show log;
 
 import 'package:injectable/injectable.dart';
 import 'package:malaz/features/rooms/data/models/room_model.dart';
-import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/util/errors/domain_errors.dart';
@@ -48,10 +47,6 @@ class RoomsRepositoryImpl implements RoomsRepository {
         color: color,
         password: password,
       );
-
-      // final List<Room> res = remoteRooms
-      //     .map((model) => model.toEntity())
-      //     .toList();
       return Success(newRoomId);
     } catch (e) {
       return Failure(_mapError(e));
@@ -62,7 +57,6 @@ class RoomsRepositoryImpl implements RoomsRepository {
   Future<Result<Room, DomainError>> getRoom(String id) async {
     try {
       final RoomModel newRoom = await remote.getRoom(id);
-
       return Success(newRoom.toEntity());
     } catch (e) {
       return Failure(SupabaseError(message: 'Failed to get room $id: $e'));

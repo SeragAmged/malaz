@@ -1,18 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:malaz/features/rooms/data/datasources/room_members_data_source.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/room_member_with_session.dart';
 import '../../domain/entities/leaderboard_entry.dart';
 import '../../domain/repositories/room_members_repository.dart';
 import '../../../../core/util/result.dart';
 import '../../../../core/util/errors/domain_errors.dart';
-import '../datasources/rooms_remote_datasource.dart';
 
 @Injectable(as: RoomMembersRepository)
 class RoomMembersRepositoryImpl implements RoomMembersRepository {
-  final RoomsRemoteDataSource _datasource;
+  final RoomMembersDataSource _datasource;
 
-  RoomMembersRepositoryImpl({required RoomsRemoteDataSource datasource})
+  RoomMembersRepositoryImpl({required RoomMembersDataSource datasource})
       : _datasource = datasource;
 
   @override

@@ -8,6 +8,7 @@ import 'package:malaz/features/auth/presentation/pages/signin_page.dart';
 import 'package:malaz/features/auth/presentation/pages/signup_page.dart';
 import 'package:malaz/features/auth/presentation/pages/profile_page.dart';
 import 'package:malaz/features/layout/layout_page.dart';
+import 'package:malaz/features/statistics/presentation/pages/statistics_page.dart';
 import 'package:malaz/features/rooms/presentation/pages/room_page.dart';
 import 'package:malaz/features/rooms/presentation/pages/rooms_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -152,9 +153,8 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: stats,
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: TempScreen(title: 'Statistics'),
-                ),
+                pageBuilder: (context, state) =>
+                    const NoTransitionPage(child: StatisticsPage()),
               ),
             ],
           ),

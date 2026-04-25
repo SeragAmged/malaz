@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:injectable/injectable.dart';
 import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/features/auth/domain/entities/auth_state_event.dart';
@@ -64,14 +66,16 @@ class AuthRemoteDataSourceImpl {
       if (user == null) {
         throw const AuthError(message: 'Failed to sign in');
       }
-
-      //TODO FIX Error
-      // Fetch user profile from database
       final response = await _supabaseClient
           .from('profiles')
           .select()
           .eq('id', user.id)
           .single();
+
+      final userEmail = _supabaseClient.auth.currentUser?.email ?? "doesn't have email";
+      response['email'] = userEmail;
+
+      log('Fetched user profile: $response');
 
       return UserModel.fromJson(response);
     } on AuthException {
@@ -86,42 +90,6 @@ class AuthRemoteDataSourceImpl {
       await _supabaseClient.auth.signOut();
     } catch (e) {
       throw AuthError(message: e.toString());
-    }
-  }
-
-  Future<UserModel?> getCurrentUser() async {
-    try {
-      final user = _supabaseClient.auth.currentUser;
-      if (user == null) return null;
-
-      final response = await _supabaseClient
-          .from('users')
-          .select()
-          .eq('id', user.id)
-          .single();
-
-      return UserModel.fromJson(response);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<bool> isAuthenticated() async {
-    try {
-      return _supabaseClient.auth.currentUser != null;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<String> getAvatarUrl(String avatarId) async {
-    try {
-      final response = _supabaseClient.storage
-          .from('avatars')
-          .getPublicUrl(avatarId);
-      return response;
-    } catch (e) {
-      throw AuthError(message: 'Failed to get avatar URL: $e');
     }
   }
 
@@ -199,9 +167,36 @@ class AuthRemoteDataSourceImpl {
   }
 
   app_user.User? _mapUser(Session? session) {
-    final json = session?.user.toJson();
-    if (json == null) return null;
+    try {
+      final json = session?.user.toJson();
+      if (json == null) return null;
 
-    return UserModel.fromJson(json).toEntity();
+      final metadata = json['user_metadata'] ?? {};
+
+      final user = UserModel(
+        id: json['id'],
+        email: json['email'],
+        fullName: metadata['full_name'],
+        avatarUrl: metadata['avatar_url'],
+        createdAt: DateTime.parse(json['created_at']),
+      ).toEntity();
+
+      log("Mapped user: ${user.id} - ${user.fullName}");
+
+      return user;
+    } catch (e) {
+      log("Failed to map user: $e");
+      return null;
+    }
+  }
+
+  Future<void> updateUserProfile({String? fullName, String? avatarUrl}) async {
+    await _supabaseClient.rpc(
+      'update_user_profile',
+      params: {'v_full_name': fullName, 'v_avatar_url': avatarUrl},
+    );
+    await _supabaseClient.auth.updateUser(
+      UserAttributes(data: {'full_name': ?fullName, 'avatar_url': ?avatarUrl}),
+    );
   }
 }

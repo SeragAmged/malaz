@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RoomMemberWithSessionModel {
 
-@JsonKey(name: 'user_id') String get userId;@JsonKey(name: 'full_name') String get fullName;@JsonKey(name: 'avatar_url') String? get avatarUrl; MemberStatus get status;@JsonKey(name: 'last_checkin_at') DateTime get lastCheckinAt;@JsonKey(name: 'completed_focus_seconds') int get completedFocusSeconds;@JsonKey(name: 'session_id') String? get sessionId;@JsonKey(name: 'session_type') SessionType? get sessionType;@JsonKey(name: 'started_at') DateTime? get startedAt;@JsonKey(name: 'planned_minutes') int? get plannedMinutes;@JsonKey(name: 'paused_at') DateTime? get pausedAt;@JsonKey(name: 'total_paused_seconds') int? get totalPausedSeconds;
+@JsonKey(name: 'user_id') String get userId;@JsonKey(name: 'full_name') String get fullName;@JsonKey(name: 'avatar_url') String? get avatarUrl; UserStatus get status;@JsonKey(name: 'last_checkin_at') DateTime get lastCheckinAt;@JsonKey(name: 'completed_focus_seconds') int get completedFocusSeconds;@JsonKey(name: 'session_id') String? get sessionId;@JsonKey(name: 'session_type') SessionType? get sessionType;@JsonKey(name: 'started_at') DateTime? get startedAt;@JsonKey(name: 'planned_minutes') int? get plannedMinutes;@JsonKey(name: 'paused_at') DateTime? get pausedAt;@JsonKey(name: 'total_paused_seconds') int? get totalPausedSeconds;
 /// Create a copy of RoomMemberWithSessionModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $RoomMemberWithSessionModelCopyWith<$Res>  {
   factory $RoomMemberWithSessionModelCopyWith(RoomMemberWithSessionModel value, $Res Function(RoomMemberWithSessionModel) _then) = _$RoomMemberWithSessionModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'user_id') String userId,@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'avatar_url') String? avatarUrl, MemberStatus status,@JsonKey(name: 'last_checkin_at') DateTime lastCheckinAt,@JsonKey(name: 'completed_focus_seconds') int completedFocusSeconds,@JsonKey(name: 'session_id') String? sessionId,@JsonKey(name: 'session_type') SessionType? sessionType,@JsonKey(name: 'started_at') DateTime? startedAt,@JsonKey(name: 'planned_minutes') int? plannedMinutes,@JsonKey(name: 'paused_at') DateTime? pausedAt,@JsonKey(name: 'total_paused_seconds') int? totalPausedSeconds
+@JsonKey(name: 'user_id') String userId,@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'avatar_url') String? avatarUrl, UserStatus status,@JsonKey(name: 'last_checkin_at') DateTime lastCheckinAt,@JsonKey(name: 'completed_focus_seconds') int completedFocusSeconds,@JsonKey(name: 'session_id') String? sessionId,@JsonKey(name: 'session_type') SessionType? sessionType,@JsonKey(name: 'started_at') DateTime? startedAt,@JsonKey(name: 'planned_minutes') int? plannedMinutes,@JsonKey(name: 'paused_at') DateTime? pausedAt,@JsonKey(name: 'total_paused_seconds') int? totalPausedSeconds
 });
 
 
@@ -71,7 +71,7 @@ userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_n
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as MemberStatus,lastCheckinAt: null == lastCheckinAt ? _self.lastCheckinAt : lastCheckinAt // ignore: cast_nullable_to_non_nullable
+as UserStatus,lastCheckinAt: null == lastCheckinAt ? _self.lastCheckinAt : lastCheckinAt // ignore: cast_nullable_to_non_nullable
 as DateTime,completedFocusSeconds: null == completedFocusSeconds ? _self.completedFocusSeconds : completedFocusSeconds // ignore: cast_nullable_to_non_nullable
 as int,sessionId: freezed == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
 as String?,sessionType: freezed == sessionType ? _self.sessionType : sessionType // ignore: cast_nullable_to_non_nullable
@@ -164,7 +164,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'user_id')  String userId, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'avatar_url')  String? avatarUrl,  MemberStatus status, @JsonKey(name: 'last_checkin_at')  DateTime lastCheckinAt, @JsonKey(name: 'completed_focus_seconds')  int completedFocusSeconds, @JsonKey(name: 'session_id')  String? sessionId, @JsonKey(name: 'session_type')  SessionType? sessionType, @JsonKey(name: 'started_at')  DateTime? startedAt, @JsonKey(name: 'planned_minutes')  int? plannedMinutes, @JsonKey(name: 'paused_at')  DateTime? pausedAt, @JsonKey(name: 'total_paused_seconds')  int? totalPausedSeconds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'user_id')  String userId, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'avatar_url')  String? avatarUrl,  UserStatus status, @JsonKey(name: 'last_checkin_at')  DateTime lastCheckinAt, @JsonKey(name: 'completed_focus_seconds')  int completedFocusSeconds, @JsonKey(name: 'session_id')  String? sessionId, @JsonKey(name: 'session_type')  SessionType? sessionType, @JsonKey(name: 'started_at')  DateTime? startedAt, @JsonKey(name: 'planned_minutes')  int? plannedMinutes, @JsonKey(name: 'paused_at')  DateTime? pausedAt, @JsonKey(name: 'total_paused_seconds')  int? totalPausedSeconds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RoomMemberWithSessionModel() when $default != null:
 return $default(_that.userId,_that.fullName,_that.avatarUrl,_that.status,_that.lastCheckinAt,_that.completedFocusSeconds,_that.sessionId,_that.sessionType,_that.startedAt,_that.plannedMinutes,_that.pausedAt,_that.totalPausedSeconds);case _:
@@ -185,7 +185,7 @@ return $default(_that.userId,_that.fullName,_that.avatarUrl,_that.status,_that.l
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'user_id')  String userId, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'avatar_url')  String? avatarUrl,  MemberStatus status, @JsonKey(name: 'last_checkin_at')  DateTime lastCheckinAt, @JsonKey(name: 'completed_focus_seconds')  int completedFocusSeconds, @JsonKey(name: 'session_id')  String? sessionId, @JsonKey(name: 'session_type')  SessionType? sessionType, @JsonKey(name: 'started_at')  DateTime? startedAt, @JsonKey(name: 'planned_minutes')  int? plannedMinutes, @JsonKey(name: 'paused_at')  DateTime? pausedAt, @JsonKey(name: 'total_paused_seconds')  int? totalPausedSeconds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'user_id')  String userId, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'avatar_url')  String? avatarUrl,  UserStatus status, @JsonKey(name: 'last_checkin_at')  DateTime lastCheckinAt, @JsonKey(name: 'completed_focus_seconds')  int completedFocusSeconds, @JsonKey(name: 'session_id')  String? sessionId, @JsonKey(name: 'session_type')  SessionType? sessionType, @JsonKey(name: 'started_at')  DateTime? startedAt, @JsonKey(name: 'planned_minutes')  int? plannedMinutes, @JsonKey(name: 'paused_at')  DateTime? pausedAt, @JsonKey(name: 'total_paused_seconds')  int? totalPausedSeconds)  $default,) {final _that = this;
 switch (_that) {
 case _RoomMemberWithSessionModel():
 return $default(_that.userId,_that.fullName,_that.avatarUrl,_that.status,_that.lastCheckinAt,_that.completedFocusSeconds,_that.sessionId,_that.sessionType,_that.startedAt,_that.plannedMinutes,_that.pausedAt,_that.totalPausedSeconds);case _:
@@ -205,7 +205,7 @@ return $default(_that.userId,_that.fullName,_that.avatarUrl,_that.status,_that.l
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'user_id')  String userId, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'avatar_url')  String? avatarUrl,  MemberStatus status, @JsonKey(name: 'last_checkin_at')  DateTime lastCheckinAt, @JsonKey(name: 'completed_focus_seconds')  int completedFocusSeconds, @JsonKey(name: 'session_id')  String? sessionId, @JsonKey(name: 'session_type')  SessionType? sessionType, @JsonKey(name: 'started_at')  DateTime? startedAt, @JsonKey(name: 'planned_minutes')  int? plannedMinutes, @JsonKey(name: 'paused_at')  DateTime? pausedAt, @JsonKey(name: 'total_paused_seconds')  int? totalPausedSeconds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'user_id')  String userId, @JsonKey(name: 'full_name')  String fullName, @JsonKey(name: 'avatar_url')  String? avatarUrl,  UserStatus status, @JsonKey(name: 'last_checkin_at')  DateTime lastCheckinAt, @JsonKey(name: 'completed_focus_seconds')  int completedFocusSeconds, @JsonKey(name: 'session_id')  String? sessionId, @JsonKey(name: 'session_type')  SessionType? sessionType, @JsonKey(name: 'started_at')  DateTime? startedAt, @JsonKey(name: 'planned_minutes')  int? plannedMinutes, @JsonKey(name: 'paused_at')  DateTime? pausedAt, @JsonKey(name: 'total_paused_seconds')  int? totalPausedSeconds)?  $default,) {final _that = this;
 switch (_that) {
 case _RoomMemberWithSessionModel() when $default != null:
 return $default(_that.userId,_that.fullName,_that.avatarUrl,_that.status,_that.lastCheckinAt,_that.completedFocusSeconds,_that.sessionId,_that.sessionType,_that.startedAt,_that.plannedMinutes,_that.pausedAt,_that.totalPausedSeconds);case _:
@@ -226,7 +226,7 @@ class _RoomMemberWithSessionModel extends RoomMemberWithSessionModel {
 @override@JsonKey(name: 'user_id') final  String userId;
 @override@JsonKey(name: 'full_name') final  String fullName;
 @override@JsonKey(name: 'avatar_url') final  String? avatarUrl;
-@override final  MemberStatus status;
+@override final  UserStatus status;
 @override@JsonKey(name: 'last_checkin_at') final  DateTime lastCheckinAt;
 @override@JsonKey(name: 'completed_focus_seconds') final  int completedFocusSeconds;
 @override@JsonKey(name: 'session_id') final  String? sessionId;
@@ -269,7 +269,7 @@ abstract mixin class _$RoomMemberWithSessionModelCopyWith<$Res> implements $Room
   factory _$RoomMemberWithSessionModelCopyWith(_RoomMemberWithSessionModel value, $Res Function(_RoomMemberWithSessionModel) _then) = __$RoomMemberWithSessionModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'user_id') String userId,@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'avatar_url') String? avatarUrl, MemberStatus status,@JsonKey(name: 'last_checkin_at') DateTime lastCheckinAt,@JsonKey(name: 'completed_focus_seconds') int completedFocusSeconds,@JsonKey(name: 'session_id') String? sessionId,@JsonKey(name: 'session_type') SessionType? sessionType,@JsonKey(name: 'started_at') DateTime? startedAt,@JsonKey(name: 'planned_minutes') int? plannedMinutes,@JsonKey(name: 'paused_at') DateTime? pausedAt,@JsonKey(name: 'total_paused_seconds') int? totalPausedSeconds
+@JsonKey(name: 'user_id') String userId,@JsonKey(name: 'full_name') String fullName,@JsonKey(name: 'avatar_url') String? avatarUrl, UserStatus status,@JsonKey(name: 'last_checkin_at') DateTime lastCheckinAt,@JsonKey(name: 'completed_focus_seconds') int completedFocusSeconds,@JsonKey(name: 'session_id') String? sessionId,@JsonKey(name: 'session_type') SessionType? sessionType,@JsonKey(name: 'started_at') DateTime? startedAt,@JsonKey(name: 'planned_minutes') int? plannedMinutes,@JsonKey(name: 'paused_at') DateTime? pausedAt,@JsonKey(name: 'total_paused_seconds') int? totalPausedSeconds
 });
 
 
@@ -292,7 +292,7 @@ userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_n
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as MemberStatus,lastCheckinAt: null == lastCheckinAt ? _self.lastCheckinAt : lastCheckinAt // ignore: cast_nullable_to_non_nullable
+as UserStatus,lastCheckinAt: null == lastCheckinAt ? _self.lastCheckinAt : lastCheckinAt // ignore: cast_nullable_to_non_nullable
 as DateTime,completedFocusSeconds: null == completedFocusSeconds ? _self.completedFocusSeconds : completedFocusSeconds // ignore: cast_nullable_to_non_nullable
 as int,sessionId: freezed == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
 as String?,sessionType: freezed == sessionType ? _self.sessionType : sessionType // ignore: cast_nullable_to_non_nullable

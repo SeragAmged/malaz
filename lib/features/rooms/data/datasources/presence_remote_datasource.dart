@@ -8,7 +8,7 @@ class PresenceRemoteDataSource {
   const PresenceRemoteDataSource({required this.supabase});
   final SupabaseClient supabase;
 
-  Future<void> setMemberStatus(MemberStatus status) async {
+  Future<void> setMemberStatus(UserStatus status) async {
     return;
     await supabase.rpc('set_member_status', params: {'p_status': status});
   }

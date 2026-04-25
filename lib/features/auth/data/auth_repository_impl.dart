@@ -77,23 +77,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<User?, DomainError>> getCurrentUser() async {
-    try {
-      final userModel = await _remoteDataSource.getCurrentUser();
-      return Success(userModel?.toEntity());
-    } on DomainError catch (e) {
-      return Failure(e);
-    } catch (e) {
-      return Failure(AuthError(message: e.toString()));
-    }
-  }
-
-  @override
-  Future<bool> isAuthenticated() {
-    return _remoteDataSource.isAuthenticated();
-  }
-
-  @override
   Future<Result<void, DomainError>> resetPassword({
     required String newPassword,
   }) async {
@@ -133,31 +116,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<User, DomainError>> updateUserProfile({
+  Future<Result<void, DomainError>> updateUserProfile({
     String? fullName,
     String? avatarUrl,
   }) async {
     try {
-      final supabaseClient = supabase.Supabase.instance.client;
-      final response = await supabaseClient.rpc(
-        'update_user_profile',
-        params: {
-          'full_name': fullName,
-          'avatar_url': avatarUrl,
-        },
-      ) as Map<String, dynamic>;
-
-      final user = User(
-        id: response['id'] ?? '',
-        email: response['email'] ?? '',
-        fullName: response['full_name'],
-        avatarUrl: response['avatar_url'],
-        createdAt: response['created_at'] != null
-            ? DateTime.parse(response['created_at'])
-            : DateTime.now(),
+      await _remoteDataSource.updateUserProfile(
+        fullName: fullName,
+        avatarUrl: avatarUrl,
       );
-
-      return Success(user);
+      return Success(null);
     } on supabase.AuthException catch (e) {
       return Failure(AuthError(message: e.message));
     } catch (e) {

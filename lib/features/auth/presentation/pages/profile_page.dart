@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -121,6 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
               _originalAvatarIndex = index;
             }
           }
+          context.read<AuthCubit>().resetSuccess();
         }
 
         if (state.hasError) {
@@ -228,7 +231,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildEditForm(AuthState state) {
     return Column(
-      // crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Avatar Selector
         BlocBuilder<AuthCubit, AuthState>(
@@ -240,12 +242,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: CircularProgressIndicator(strokeWidth: 2.w),
               );
             }
-
+            log(
+              'Building AvatarSelector with ${authState.avatarUrls.length} avatars, selected index: ${authState.selectedAvatarIndex}',
+            );
             return AvatarSelector(
               selectedAvatarIndex: authState.selectedAvatarIndex,
               avatarUrls: authState.avatarUrls,
-              onAvatarSelected: (avatarIndex) =>
-                  context.read<AuthCubit>().selectAvatar(avatarIndex),
+              onAvatarSelected: context.read<AuthCubit>().selectAvatar,
             );
           },
         ),

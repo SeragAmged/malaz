@@ -13,9 +13,11 @@ _RoomModel _$RoomModelFromJson(Map<String, dynamic> json) => _RoomModel(
   backgroundUrl: json['background_url'] as String?,
   type: json['type'] as String,
   color: json['color'] as String,
-  membersAvatars: (json['members_avatars'] as List<dynamic>)
-      .map((e) => e as String)
-      .toList(),
+  membersAvatars:
+      (json['members_avatars'] as List<dynamic>?)
+          ?.map((e) => e as String?)
+          .toList() ??
+      [],
   activeMembers: (json['active_members'] as num).toInt(),
   maxMembers: (json['max_members'] as num).toInt(),
   isProtected: json['is_protected'] as bool,

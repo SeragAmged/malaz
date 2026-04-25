@@ -16,7 +16,7 @@ class PresenceRepositoryImpl implements PresenceRepository {
   PresenceRepositoryImpl(this._dataSource);
 
   @override
-  Future<Result<void, DomainError>> setStatus(MemberStatus status) async {
+  Future<Result<void, DomainError>> setStatus(UserStatus status) async {
     try {
       await _dataSource.setMemberStatus(status);
       return Success(null);

@@ -31,26 +31,50 @@ class AuthCubit extends Cubit<AuthState> {
         switch (event.type) {
           case AuthEventType.authenticated:
             emit(
-              AuthState(authStatus: AuthStatus.authenticated, user: event.user),
+              state.copyWith(
+                authStatus: AuthStatus.authenticated,
+                user: event.user,
+                errorMessage: null,
+                isLoadingAvatars: false,
+                screenState: ScreenState.initial,
+                uiState: UiState.initial,
+              ),
             );
             break;
 
           case AuthEventType.unauthenticated:
-            emit(const AuthState(authStatus: AuthStatus.unauthenticated));
+            emit(
+              state.copyWith(
+                authStatus: AuthStatus.unauthenticated,
+                user: event.user,
+                errorMessage: null,
+                isLoadingAvatars: false,
+                screenState: ScreenState.initial,
+                uiState: UiState.initial,
+              ),
+            );
             break;
 
           case AuthEventType.passwordRecovery:
             emit(
-              AuthState(
+              state.copyWith(
                 screenState: ScreenState.passwordRecovery,
                 user: event.user,
+                errorMessage: null,
+                isLoadingAvatars: false,
+                uiState: UiState.initial,
               ),
             );
             break;
         }
       },
       onError: (error) {
-        emit(AuthState(errorMessage: error.toString()));
+        emit(
+          state.copyWith(
+            errorMessage: error.toString(),
+            avatarUrls: state.avatarUrls,
+          ),
+        );
       },
     );
   }
@@ -189,7 +213,6 @@ class AuthCubit extends Cubit<AuthState> {
       fullName: fullName,
       avatarUrl: avatarUrl,
     );
-
     result.fold(
       onFailure: (error, _) {
         emit(
@@ -201,18 +224,8 @@ class AuthCubit extends Cubit<AuthState> {
         );
       },
       onSuccess: (updatedUser) {
-        emit(
-          state.copyWith(
-            uiState: UiState.success,
-            user: updatedUser,
-            errorMessage: null,
-          ),
-        );
+        emit(state.copyWith(uiState: UiState.success, errorMessage: null));
         // Reset to initial after brief success state
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (isClosed) return;
-          emit(state.copyWith(uiState: UiState.initial));
-        });
       },
     );
   }

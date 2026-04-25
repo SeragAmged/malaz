@@ -13,9 +13,10 @@ abstract class RoomMemberWithSessionModel with _$RoomMemberWithSessionModel {
     @JsonKey(name: 'user_id') required String userId,
     @JsonKey(name: 'full_name') required String fullName,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
-    required MemberStatus status,
+    required UserStatus status,
     @JsonKey(name: 'last_checkin_at') required DateTime lastCheckinAt,
-    @JsonKey(name: 'completed_focus_seconds') required int completedFocusSeconds,
+    @JsonKey(name: 'completed_focus_seconds')
+    required int completedFocusSeconds,
     @JsonKey(name: 'session_id') String? sessionId,
     @JsonKey(name: 'session_type') SessionType? sessionType,
     @JsonKey(name: 'started_at') DateTime? startedAt,

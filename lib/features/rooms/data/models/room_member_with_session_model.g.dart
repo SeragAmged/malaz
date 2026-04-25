@@ -12,7 +12,7 @@ _RoomMemberWithSessionModel _$RoomMemberWithSessionModelFromJson(
   userId: json['user_id'] as String,
   fullName: json['full_name'] as String,
   avatarUrl: json['avatar_url'] as String?,
-  status: $enumDecode(_$MemberStatusEnumMap, json['status']),
+  status: $enumDecode(_$UserStatusEnumMap, json['status']),
   lastCheckinAt: DateTime.parse(json['last_checkin_at'] as String),
   completedFocusSeconds: (json['completed_focus_seconds'] as num).toInt(),
   sessionId: json['session_id'] as String?,
@@ -33,7 +33,7 @@ Map<String, dynamic> _$RoomMemberWithSessionModelToJson(
   'user_id': instance.userId,
   'full_name': instance.fullName,
   'avatar_url': instance.avatarUrl,
-  'status': _$MemberStatusEnumMap[instance.status]!,
+  'status': _$UserStatusEnumMap[instance.status]!,
   'last_checkin_at': instance.lastCheckinAt.toIso8601String(),
   'completed_focus_seconds': instance.completedFocusSeconds,
   'session_id': instance.sessionId,
@@ -44,12 +44,12 @@ Map<String, dynamic> _$RoomMemberWithSessionModelToJson(
   'total_paused_seconds': instance.totalPausedSeconds,
 };
 
-const _$MemberStatusEnumMap = {
-  MemberStatus.online: 'online',
-  MemberStatus.working: 'working',
-  MemberStatus.onBreak: 'onBreak',
-  MemberStatus.idle: 'idle',
-  MemberStatus.offline: 'offline',
+const _$UserStatusEnumMap = {
+  UserStatus.online: 'online',
+  UserStatus.working: 'working',
+  UserStatus.onBreak: 'onBreak',
+  UserStatus.idle: 'idle',
+  UserStatus.offline: 'offline',
 };
 
 const _$SessionTypeEnumMap = {

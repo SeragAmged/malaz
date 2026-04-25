@@ -1,4 +1,3 @@
-
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
 
 class RoomMemberWithSession {
@@ -19,11 +18,11 @@ class RoomMemberWithSession {
   final String userId;
   final String fullName;
   final String? avatarUrl;
-  final MemberStatus status;
+  final UserStatus status;
   final DateTime lastCheckinAt;
   final int completedFocusSeconds;
   final String? sessionId;
-  final SessionType? sessionType; 
+  final SessionType? sessionType;
   final DateTime? startedAt;
   final int? plannedMinutes;
   final DateTime? pausedAt;

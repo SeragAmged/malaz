@@ -26,6 +26,7 @@ class OutlinedActionButton extends StatelessWidget {
             ? const BorderSide(color: AppColors.borderColor)
             : null,
         backgroundColor: backgroundColor ?? Colors.transparent,
+        
 
         padding: EdgeInsets.symmetric(vertical: 13.h),
       ),

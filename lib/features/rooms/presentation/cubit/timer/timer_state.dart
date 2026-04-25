@@ -5,8 +5,6 @@ part 'timer_state.freezed.dart';
 
 enum TimerStatus { idle, running, paused }
 
-// enum SessionMode { focus, breakTime }
-
 @freezed
 abstract class TimerState with _$TimerState {
   const TimerState._();

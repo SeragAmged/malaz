@@ -18,7 +18,7 @@ abstract class AppTextStyles {
   static TextStyle _style({
     required double fontSize,
     required FontWeight fontWeight,
-    required double height,
+    double? height,
     required double letterSpacing,
     required Color color,
     required String fontFamily,
@@ -209,5 +209,22 @@ abstract class AppTextStyles {
     letterSpacing: 0,
     color: AppColors.textPrimaryColor,
     fontFamily: spaceGrotesk,
+  );
+
+  static TextStyle timerLabel = _style(
+    color: AppColors.textPrimaryColor,
+    height: 1.2,
+    fontFamily: spaceGrotesk,
+    fontSize: 14.sp,
+    letterSpacing: 4.2,
+    fontWeight: FontWeight.w400,
+  );
+
+  static TextStyle get timerLabelBold => _style(
+    fontFamily: AppTextStyles.manrope,
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 0.35,
+    color: AppColors.textPrimaryColor,
   );
 }

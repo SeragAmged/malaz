@@ -26,8 +26,9 @@ void main() {
       mockPresenceRepository = MockPresenceRepository();
 
       // Setup default mock return values to avoid null issues
-      when(() => mockSessionRepository.endSession(any(), any()))
-          .thenAnswer((_) async => const Success(null));
+      when(
+        () => mockSessionRepository.endSession(any(), any()),
+      ).thenAnswer((_) async => const Success(null));
 
       timerCubit = TimerCubit(
         roomId: 'test-room-id',
@@ -57,8 +58,9 @@ void main() {
     group('startSession()', () {
       test('emits loading state then running state on success', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
 
         // Act
         unawaited(timerCubit.startSession());
@@ -72,8 +74,9 @@ void main() {
       test('sets sessionId from repository response', () async {
         // Arrange
         const testSessionId = 'session-test-123';
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success(testSessionId));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success(testSessionId));
 
         // Act
         await timerCubit.startSession();
@@ -84,24 +87,23 @@ void main() {
 
       test('calls repository startSession with correct parameters', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
 
         // Act
         await timerCubit.startSession();
 
         // Assert
-        verify(() => mockSessionRepository.startSession('focus', 25))
-            .called(1);
+        verify(() => mockSessionRepository.startSession('focus', 25)).called(1);
       });
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to start session';
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => Failure(
-              NetworkError(message: errorMessage),
-            ));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => Failure(NetworkError(message: errorMessage)));
 
         // Act
         await timerCubit.startSession();
@@ -113,26 +115,30 @@ void main() {
 
       test('does not start session if not idle', () async {
         // Arrange: Set cubit to running state
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
         await timerCubit.startSession();
 
         // Act: Try to start again (should be ignored)
         await timerCubit.startSession();
 
         // Assert
-        verify(() => mockSessionRepository.startSession('focus', 25))
-            .called(1); // Only called once
+        verify(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).called(1); // Only called once
       });
     });
 
     group('pauseSession()', () {
       test('cancels ticker and emits paused state', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.startSession();
@@ -145,29 +151,32 @@ void main() {
 
       test('calls repository pauseSession with sessionId', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.startSession();
         await timerCubit.pauseSession();
 
         // Assert
-        verify(() => mockSessionRepository.pauseSession('session-123'))
-            .called(1);
+        verify(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).called(1);
       });
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to pause session';
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => Failure(
-              NetworkError(message: errorMessage),
-            ));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => Failure(NetworkError(message: errorMessage)));
 
         // Act
         await timerCubit.startSession();
@@ -191,12 +200,15 @@ void main() {
     group('resumeSession()', () {
       test('emits running state on resume', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
-        when(() => mockSessionRepository.resumeSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.resumeSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.startSession();
@@ -210,12 +222,15 @@ void main() {
 
       test('calls repository resumeSession with sessionId', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
-        when(() => mockSessionRepository.resumeSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.resumeSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.startSession();
@@ -223,21 +238,23 @@ void main() {
         await timerCubit.resumeSession();
 
         // Assert
-        verify(() => mockSessionRepository.resumeSession('session-123'))
-            .called(1);
+        verify(
+          () => mockSessionRepository.resumeSession('session-123'),
+        ).called(1);
       });
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to resume session';
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
-        when(() => mockSessionRepository.resumeSession('session-123'))
-            .thenAnswer((_) async => Failure(
-              NetworkError(message: errorMessage),
-            ));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.resumeSession('session-123'),
+        ).thenAnswer((_) async => Failure(NetworkError(message: errorMessage)));
 
         // Act
         await timerCubit.startSession();
@@ -306,10 +323,12 @@ void main() {
 
       test('ends active session if running', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.endSession('session-123', 'interrupted'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).thenAnswer((_) async => const Success(null));
 
         await timerCubit.startSession();
         expect(timerCubit.state.status, TimerStatus.running);
@@ -318,8 +337,9 @@ void main() {
         await timerCubit.flipMode();
 
         // Assert
-        verify(() => mockSessionRepository.endSession('session-123', 'interrupted'))
-            .called(1);
+        verify(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).called(1);
         expect(timerCubit.state.status, TimerStatus.idle);
         expect(timerCubit.state.sessionId, isNull);
       });
@@ -357,8 +377,9 @@ void main() {
 
       test('does not update durations if running', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
         await timerCubit.startSession();
 
         // Act
@@ -370,10 +391,12 @@ void main() {
 
       test('does not update durations if paused', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.pauseSession('session-123'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.pauseSession('session-123'),
+        ).thenAnswer((_) async => const Success(null));
         await timerCubit.startSession();
         await timerCubit.pauseSession();
 
@@ -435,23 +458,25 @@ void main() {
     group('setOffline()', () {
       test('calls presence repository setStatus with offline', () async {
         // Arrange
-        when(() => mockPresenceRepository.setStatus(MemberStatus.offline))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockPresenceRepository.setStatus(UserStatus.offline),
+        ).thenAnswer((_) async => const Success(null));
 
         // Act
         await timerCubit.setOffline();
 
         // Assert
-        verify(() => mockPresenceRepository.setStatus(MemberStatus.offline)).called(1);
+        verify(
+          () => mockPresenceRepository.setStatus(UserStatus.offline),
+        ).called(1);
       });
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to set offline status';
-        when(() => mockPresenceRepository.setStatus(MemberStatus.offline))
-            .thenAnswer((_) async => Failure(
-              NetworkError(message: errorMessage),
-            ));
+        when(
+          () => mockPresenceRepository.setStatus(UserStatus.offline),
+        ).thenAnswer((_) async => Failure(NetworkError(message: errorMessage)));
 
         // Act
         await timerCubit.setOffline();
@@ -462,41 +487,53 @@ void main() {
     });
 
     group('setOnline()', () {
-      test('calls presence repository setStatus with online when idle', () async {
-        // Arrange
-        when(() => mockPresenceRepository.setStatus(MemberStatus.online))
-            .thenAnswer((_) async => const Success(null));
+      test(
+        'calls presence repository setStatus with online when idle',
+        () async {
+          // Arrange
+          when(
+            () => mockPresenceRepository.setStatus(UserStatus.online),
+          ).thenAnswer((_) async => const Success(null));
 
-        // Act
-        await timerCubit.setOnline();
+          // Act
+          await timerCubit.setOnline();
 
-        // Assert
-        verify(() => mockPresenceRepository.setStatus(MemberStatus.online)).called(1);
-      });
+          // Assert
+          verify(
+            () => mockPresenceRepository.setStatus(UserStatus.online),
+          ).called(1);
+        },
+      );
 
-      test('calls presence repository setStatus with working when running', () async {
-        // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockPresenceRepository.setStatus(MemberStatus.working))
-            .thenAnswer((_) async => const Success(null));
+      test(
+        'calls presence repository setStatus with working when running',
+        () async {
+          // Arrange
+          when(
+            () => mockSessionRepository.startSession('focus', 25),
+          ).thenAnswer((_) async => const Success('session-123'));
+          when(
+            () => mockPresenceRepository.setStatus(UserStatus.working),
+          ).thenAnswer((_) async => const Success(null));
 
-        await timerCubit.startSession();
+          await timerCubit.startSession();
 
-        // Act
-        await timerCubit.setOnline();
+          // Act
+          await timerCubit.setOnline();
 
-        // Assert
-        verify(() => mockPresenceRepository.setStatus(MemberStatus.working)).called(1);
-      });
+          // Assert
+          verify(
+            () => mockPresenceRepository.setStatus(UserStatus.working),
+          ).called(1);
+        },
+      );
 
       test('sets error message on failure', () async {
         // Arrange
         const errorMessage = 'Failed to set online status';
-        when(() => mockPresenceRepository.setStatus(MemberStatus.online))
-            .thenAnswer((_) async => Failure(
-              NetworkError(message: errorMessage),
-            ));
+        when(
+          () => mockPresenceRepository.setStatus(UserStatus.online),
+        ).thenAnswer((_) async => Failure(NetworkError(message: errorMessage)));
 
         // Act
         await timerCubit.setOnline();
@@ -509,16 +546,18 @@ void main() {
     group('endSession()', () {
       test('emits idle state and clears sessionId on success', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.endSession('session-123', 'completed'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.completed),
+        ).thenAnswer((_) async => const Success(null));
 
         await timerCubit.startSession();
         expect(timerCubit.state.sessionId, 'session-123');
 
         // Act
-        await timerCubit.endSession(reason: 'completed');
+        await timerCubit.endSession(reason:SessionEndReason.completed);
 
         // Assert
         expect(timerCubit.state.status, TimerStatus.idle);
@@ -528,33 +567,38 @@ void main() {
 
       test('calls repository endSession with correct reason', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.endSession('session-123', 'interrupted'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).thenAnswer((_) async => const Success(null));
 
         await timerCubit.startSession();
 
         // Act
-        await timerCubit.endSession(reason: 'interrupted');
+        await timerCubit.endSession(reason: SessionEndReason.interrupted);
 
         // Assert
-        verify(() => mockSessionRepository.endSession('session-123', 'interrupted'))
-            .called(1);
+        verify(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).called(1);
       });
 
       test('toggles mode to breakTime after focus session', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.endSession('session-123', 'completed'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.endSession('session-123',SessionEndReason.completed),
+        ).thenAnswer((_) async => const Success(null));
 
         expect(timerCubit.state.mode, SessionType.focus);
         await timerCubit.startSession();
 
         // Act
-        await timerCubit.endSession(reason: 'completed');
+        await timerCubit.endSession(reason:SessionEndReason.completed);
 
         // Assert
         expect(timerCubit.state.mode, SessionType.breakTime);
@@ -562,7 +606,7 @@ void main() {
 
       test('does nothing if sessionId is null', () async {
         // Act
-        await timerCubit.endSession(reason: 'completed');
+        await timerCubit.endSession(reason:SessionEndReason.completed);
 
         // Assert
         verifyNever(() => mockSessionRepository.endSession(any(), any()));
@@ -577,16 +621,20 @@ void main() {
 
         // Assert
         expect(timerCubit.state.status, TimerStatus.idle);
-        expect(timerCubit.state.remainingSeconds,
-            timerCubit.state.focusDuration * 60);
+        expect(
+          timerCubit.state.remainingSeconds,
+          timerCubit.state.focusDuration * 60,
+        );
       });
 
       test('ends session and resets when session is running', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.endSession('session-123', 'reset'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).thenAnswer((_) async => const Success(null));
 
         await timerCubit.startSession();
 
@@ -604,8 +652,9 @@ void main() {
     group('Stream behavior', () {
       test('emits state changes as stream', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
 
         // Act & Assert
         expect(
@@ -635,8 +684,9 @@ void main() {
 
       test('state properties update correctly after startSession', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
 
         // Act
         await timerCubit.startSession();
@@ -667,25 +717,29 @@ void main() {
       test('starting session in break mode uses correct duration', () async {
         // Arrange
         await timerCubit.flipMode(); // Switch to break mode
-        when(() => mockSessionRepository.startSession('breakTime', 5))
-            .thenAnswer((_) async => const Success('session-456'));
+        when(
+          () => mockSessionRepository.startSession('breakTime', 5),
+        ).thenAnswer((_) async => const Success('session-456'));
 
         // Act
         await timerCubit.startSession();
 
         // Assert
-        verify(() => mockSessionRepository.startSession('breakTime', 5))
-            .called(1);
+        verify(
+          () => mockSessionRepository.startSession('breakTime', 5),
+        ).called(1);
       });
     });
 
     group('Close behavior', () {
       test('ends active session on close', () async {
         // Arrange
-        when(() => mockSessionRepository.startSession('focus', 25))
-            .thenAnswer((_) async => const Success('session-123'));
-        when(() => mockSessionRepository.endSession('session-123', 'interrupted'))
-            .thenAnswer((_) async => const Success(null));
+        when(
+          () => mockSessionRepository.startSession('focus', 25),
+        ).thenAnswer((_) async => const Success('session-123'));
+        when(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).thenAnswer((_) async => const Success(null));
 
         await timerCubit.startSession();
 
@@ -693,8 +747,9 @@ void main() {
         await timerCubit.close();
 
         // Assert
-        verify(() => mockSessionRepository.endSession('session-123', 'interrupted'))
-            .called(1);
+        verify(
+          () => mockSessionRepository.endSession('session-123', SessionEndReason.interrupted),
+        ).called(1);
       });
 
       test('does not end session if no sessionId on close', () async {

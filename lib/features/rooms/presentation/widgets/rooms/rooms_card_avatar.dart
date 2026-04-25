@@ -5,7 +5,7 @@ import 'package:malaz/core/theme/app_colors.dart';
 class RoomsCardAvatar extends StatelessWidget {
   const RoomsCardAvatar({super.key, required this.url, required this.size});
 
-  final String url;
+  final String? url;
   final double size;
 
   @override
@@ -23,7 +23,7 @@ class RoomsCardAvatar extends StatelessWidget {
       ),
       child: ClipOval(
         child: Image.network(
-          url,
+          url ?? '',
           fit: BoxFit.cover,
           errorBuilder: (_, _, _) => Icon(
             Icons.person,

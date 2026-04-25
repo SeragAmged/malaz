@@ -11,13 +11,6 @@ import 'package:malaz/features/rooms/domain/repositories/session_repository.dart
 import 'timer_state.dart';
 
 class TimerCubit extends Cubit<TimerState> {
-  final String roomId;
-  final SessionRepository _sessionRepository;
-  final PresenceRepository _presenceRepository;
-
-  Timer? _ticker;
-  DateTime? _backgroundedAt; // wall-clock time when app went to background
-
   TimerCubit({
     required this.roomId,
     required SessionRepository sessionRepository,
@@ -25,6 +18,13 @@ class TimerCubit extends Cubit<TimerState> {
   }) : _sessionRepository = sessionRepository,
        _presenceRepository = presenceRepository,
        super(const TimerState());
+
+  final String roomId;
+  final SessionRepository _sessionRepository;
+  final PresenceRepository _presenceRepository;
+
+  Timer? _ticker;
+  DateTime? _backgroundedAt;
 
   @override
   Future<void> close() async {
@@ -139,7 +139,7 @@ class TimerCubit extends Cubit<TimerState> {
   }
 
   Future<void> endSession({
-    String reason = 'interrupted',
+    SessionEndReason reason = SessionEndReason.interrupted,
     bool reset = false,
   }) async {
     if (state.sessionId == null) return;
@@ -182,7 +182,7 @@ class TimerCubit extends Cubit<TimerState> {
   void resetSession() {
     _ticker?.cancel();
     if (state.sessionId != null) {
-      endSession(reason: 'interrupted', reset: true);
+      endSession(reason: SessionEndReason.interrupted, reset: true);
     } else {
       emit(state.copyWith(status: TimerStatus.idle));
     }
@@ -191,7 +191,7 @@ class TimerCubit extends Cubit<TimerState> {
 
   Future<void> flipMode() async {
     if (state.sessionId != null) {
-      await endSession(reason: 'interrupted');
+      await endSession(reason: SessionEndReason.interrupted);
     } else {
       _flipMode();
       _resetTimer();
@@ -215,12 +215,11 @@ class TimerCubit extends Cubit<TimerState> {
     _resetTimer();
   }
 
-  /// Set user as offline
   Future<void> setOffline() async {
     if (state.isRunning) _backgroundedAt = DateTime.now();
 
     if (!state.isRunning) {
-      final result = await _presenceRepository.setStatus(MemberStatus.offline);
+      final result = await _presenceRepository.setStatus(UserStatus.offline);
       if (isClosed) return;
       result.fold(
         onSuccess: (_) {},
@@ -235,42 +234,38 @@ class TimerCubit extends Cubit<TimerState> {
     }
   }
 
-  /// Set user as online
   Future<void> setOnline() async {
-    // Reconcile timer if we were running when we went to background
     if (_backgroundedAt != null && state.isRunning) {
       final elapsed = DateTime.now().difference(_backgroundedAt!).inSeconds;
       _backgroundedAt = null;
 
       final newRemaining = state.remainingSeconds - elapsed;
 
+      // Session expired while app was backgrounded
       if (newRemaining <= 0) {
-        // Session expired while app was backgrounded
         _ticker?.cancel();
-        endSession(reason: 'completed');
+        endSession(reason: SessionEndReason.completed);
         return;
       }
 
-      // Update remaining and restart ticker to re-sync 1s interval
       emit(state.copyWith(remainingSeconds: newRemaining));
       _startTicker();
     } else {
       _backgroundedAt = null;
     }
 
+    //update User Statues
     final status = state.isRunning
         ? state.isFocusMode
-              ? MemberStatus.working
-              : MemberStatus.onBreak
-        : MemberStatus.online;
+              ? UserStatus.working
+              : UserStatus.onBreak
+        : UserStatus.online;
     final result = await _presenceRepository.setStatus(status);
 
     if (isClosed) return;
 
     result.fold(
-      onSuccess: (_) {
-        // Status updated successfully
-      },
+      onSuccess: (_) {},
       onFailure: (error, _) {
         emit(
           state.copyWith(
@@ -281,7 +276,6 @@ class TimerCubit extends Cubit<TimerState> {
     );
   }
 
-  /// Attempt to recover an active session from the server
   Future<void> tryRecoverSession() async {
     emit(state.copyWith(isLoading: true));
 
@@ -296,22 +290,18 @@ class TimerCubit extends Cubit<TimerState> {
           return;
         }
 
-        // Set sessionId first so endSession can call RPC if expired
         emit(state.copyWith(sessionId: session.sessionId, isLoading: false));
 
         final plannedSeconds = session.plannedMinutes * 60;
         final int remaining;
 
         if (session.isPaused && session.pausedAt != null) {
-          // elapsed active time = (paused_at - started_at) - total_paused_seconds_before
-          // total_paused_seconds already includes all previous pauses but NOT the current one
           final totalElapsed = session.pausedAt!
               .difference(session.startedAt)
               .inSeconds;
           final activeElapsed = totalElapsed - session.totalPausedSeconds;
           remaining = (plannedSeconds - activeElapsed).clamp(0, plannedSeconds);
         } else {
-          // elapsed active time = (now - started_at) - total_paused_seconds
           final totalElapsed = DateTime.now()
               .difference(session.startedAt)
               .inSeconds;
@@ -320,7 +310,7 @@ class TimerCubit extends Cubit<TimerState> {
         }
 
         if (remaining <= 0) {
-          endSession(reason: 'completed');
+          endSession(reason: SessionEndReason.completed);
           return;
         }
 
@@ -343,16 +333,12 @@ class TimerCubit extends Cubit<TimerState> {
           _startTicker();
         }
       },
-      onFailure: (_, _) =>
-          emit(state.copyWith(isLoading: false)), // silently fail
+      onFailure: (_, _) => emit(state.copyWith(isLoading: false)),
     );
   }
 
-  /// Start the ticker that decrements the timer every second
   void _startTicker() {
     _ticker?.cancel();
-    // Record the wall-clock start time if not already set
-    // (preserves it on resume so elapsed math stays correct)
     if (state.sessionStartedAt == null) {
       emit(state.copyWith(sessionStartedAt: DateTime.now()));
     }
@@ -361,19 +347,17 @@ class TimerCubit extends Cubit<TimerState> {
     });
   }
 
-  /// Handle each tick of the timer
   void _onTick() {
     final newRemainingSeconds = state.remainingSeconds - 1;
 
     if (newRemainingSeconds <= 0) {
       _ticker?.cancel();
-      endSession(reason: 'completed');
+      endSession(reason: SessionEndReason.completed);
     } else {
       emit(state.copyWith(remainingSeconds: newRemainingSeconds));
     }
   }
 
-  /// Toggle the session mode between focus and break
   void _flipMode() {
     final newMode = state.isFocusMode
         ? SessionType.breakTime
@@ -382,7 +366,6 @@ class TimerCubit extends Cubit<TimerState> {
     _resetTimer();
   }
 
-  /// Reset the timer to the initial duration based on current mode
   void _resetTimer() {
     final durationMinutes = state.mode == SessionType.focus
         ? state.focusDuration

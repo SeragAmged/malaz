@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
+import 'package:malaz/core/theme/extensions.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import 'package:malaz/features/rooms/domain/entities/room.dart';
 import 'package:malaz/features/rooms/presentation/cubit/rooms/rooms_cubit.dart';
@@ -25,20 +26,7 @@ class _RoomCardState extends State<RoomCard> {
       widget.room.sessionStartedAt != null &&
       widget.room.pausedAt == null;
 
-  Color get _accentColor {
-    try {
-      final hex = widget.room.color.replaceAll('#', '').padLeft(6, '0');
-      return Color(int.parse('FF$hex', radix: 16));
-    } catch (_) {
-      return AppColors.primaryColor;
-    }
-  }
-
-  Color get getContrastColor {
-    return _accentColor.computeLuminance() > 0.5
-        ? AppColors.onInverseSurfaceColor
-        : AppColors.textPrimaryColor;
-  }
+  Color get _accentColor => widget.room.color.toColor;
 
   void _handleJoinPress() {
     if (widget.room.isProtected && !widget.room.isMember) {
@@ -167,14 +155,14 @@ class _RoomCardState extends State<RoomCard> {
                                     height: 16.r,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: getContrastColor,
+                                      color: _accentColor.getContrastColor,
                                     ),
                                   )
                                 else
                                   Text(
                                     widget.room.isMember ? 'Go Back' : 'Join',
                                     style: AppTextStyles.labelMedium.copyWith(
-                                      color: getContrastColor,
+                                      color: _accentColor.getContrastColor,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -184,7 +172,7 @@ class _RoomCardState extends State<RoomCard> {
                                     child: Icon(
                                       Icons.lock_rounded,
                                       size: 16.r,
-                                      color: getContrastColor,
+                                      color: _accentColor.getContrastColor,
                                     ),
                                   ),
                               ],

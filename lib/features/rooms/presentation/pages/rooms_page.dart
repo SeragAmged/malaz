@@ -6,6 +6,7 @@ import 'package:malaz/core/di/providers.dart';
 import 'package:malaz/core/router/app_router.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
+import 'package:malaz/core/theme/extensions.dart';
 import 'package:malaz/core/util/errors/domain_errors.dart';
 import 'package:malaz/core/widgets/blurred_circle_decoration.dart';
 import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
@@ -100,8 +101,18 @@ class _RoomsViewState extends State<_RoomsView> {
                 }
                 if (state.isJoinSuccess) {
                   context.read<RoomsCubit>().resetStatuses();
-                  context.go('${AppRouter.rooms}/${state.joinedRoomId}');
-                }
+                  final joinedRoom = state.rooms.firstWhere(
+                    (room) => room.id == state.joinedRoomId,
+                  );
+                  context.go(
+                    '${AppRouter.rooms}/${state.joinedRoomId}',
+                    
+                    extra: {
+                      'name': joinedRoom.name,
+                      'color': joinedRoom.color.toColor,
+                    },
+                    );
+                  }
                 if (state.isJoinFailure) {
                   if (state.joinError is AlreadyInRoom) {
                     showDialog(

@@ -6,7 +6,6 @@ class ActiveSession {
     required this.sessionType,
     required this.startedAt,
     required this.plannedMinutes,
-    // required this.status,
     required this.totalPausedSeconds,
     this.pausedAt,
   });
@@ -15,7 +14,6 @@ class ActiveSession {
   final SessionType sessionType;
   final DateTime startedAt;
   final int plannedMinutes;
-  // final String status;
   final int totalPausedSeconds;
   final DateTime? pausedAt;
 

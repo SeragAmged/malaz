@@ -7,7 +7,7 @@ import 'package:malaz/features/rooms/presentation/widgets/rooms/rooms_card_avata
 class AvatarStack extends StatelessWidget {
   const AvatarStack({super.key, required this.avatars});
 
-  final List<String> avatars;
+  final List<String?> avatars;
 
   @override
   Widget build(BuildContext context) {

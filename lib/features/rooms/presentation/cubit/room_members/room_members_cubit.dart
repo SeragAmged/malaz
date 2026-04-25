@@ -52,7 +52,9 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
 
         // Track which members are paused
         final pausedMemberIds = members
-            .where((member) => member.sessionId != null && member.pausedAt != null)
+            .where(
+              (member) => member.sessionId != null && member.pausedAt != null,
+            )
             .map((member) => member.userId)
             .toSet();
 
@@ -135,11 +137,7 @@ class RoomMembersCubit extends Cubit<RoomMembersState> {
 
     result.fold(
       onSuccess: (leaders) {
-        emit(
-          state.copyWith(
-            topLeaders: leaders,
-          ),
-        );
+        emit(state.copyWith(topLeaders: leaders));
       },
       onFailure: (error, _) {
         // Keep existing leaderboard data on error, just log it
