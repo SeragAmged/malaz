@@ -55,30 +55,6 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  /// Check if user is authenticated on app start
-  Future<void> _checkAuthStatus() async {
-    final isAuthenticated = await _repository.isAuthenticated();
-    if (isAuthenticated) {
-      final result = await _repository.getCurrentUser();
-      result.fold(
-        onFailure: (error, _) => emit(
-          state.copyWith(errorMessage: error.message ?? 'Unknown error'),
-        ),
-        onSuccess: (user) {
-          if (user != null) {
-            emit(
-              state.copyWith(authStatus: AuthStatus.authenticated, user: user),
-            );
-          } else {
-            emit(state.copyWith(authStatus: AuthStatus.unauthenticated));
-          }
-        },
-      );
-    } else {
-      emit(state.copyWith(authStatus: AuthStatus.unauthenticated));
-    }
-  }
-
   /// Sign up with email and password
   Future<void> signUp({
     required String email,
@@ -206,10 +182,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> updateUserProfile({
-    String? fullName,
-    String? avatarUrl,
-  }) async {
+  Future<void> updateUserProfile({String? fullName, String? avatarUrl}) async {
     emit(state.copyWith(uiState: UiState.loading, user: state.user));
 
     final result = await _repository.updateUserProfile(
@@ -219,18 +192,22 @@ class AuthCubit extends Cubit<AuthState> {
 
     result.fold(
       onFailure: (error, _) {
-        emit(state.copyWith(
-          uiState: UiState.initial,
-          errorMessage: error.message ?? 'Failed to update profile',
-          user: state.user,
-        ));
+        emit(
+          state.copyWith(
+            uiState: UiState.initial,
+            errorMessage: error.message ?? 'Failed to update profile',
+            user: state.user,
+          ),
+        );
       },
       onSuccess: (updatedUser) {
-        emit(state.copyWith(
-          uiState: UiState.success,
-          user: updatedUser,
-          errorMessage: null,
-        ));
+        emit(
+          state.copyWith(
+            uiState: UiState.success,
+            user: updatedUser,
+            errorMessage: null,
+          ),
+        );
         // Reset to initial after brief success state
         Future.delayed(const Duration(milliseconds: 500), () {
           if (isClosed) return;

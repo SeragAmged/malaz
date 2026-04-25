@@ -20,9 +20,6 @@ abstract class AuthRepository {
 
   Future<Result<void, DomainError>> signOut();
 
-  Future<Result<User?, DomainError>> getCurrentUser();
-
-  Future<bool> isAuthenticated();
 
   Stream<AuthStateEvent> watchAuthState();
 
