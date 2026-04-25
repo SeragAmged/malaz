@@ -6,6 +6,7 @@ import 'package:malaz/features/auth/presentation/pages/forgot_password_page.dart
 import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:malaz/features/auth/presentation/pages/signin_page.dart';
 import 'package:malaz/features/auth/presentation/pages/signup_page.dart';
+import 'package:malaz/features/auth/presentation/pages/profile_page.dart';
 import 'package:malaz/features/layout/layout_page.dart';
 import 'package:malaz/features/rooms/presentation/pages/room_page.dart';
 import 'package:malaz/features/rooms/presentation/pages/rooms_page.dart';
@@ -133,8 +134,14 @@ class AppRouter {
                 routes: [
                   GoRoute(
                     path: ':id',
-                    builder: (context, state) =>
-                        RoomPage(roomId: state.pathParameters['id']!),
+                    builder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>? ?? {};
+                      return RoomPage(
+                        roomId: state.pathParameters['id']!,
+                        roomName: extra['name'] ?? 'ZENGARDERN',
+                        roomColor: extra['color'] as Color? ?? Colors.blueGrey,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -157,7 +164,7 @@ class AppRouter {
               GoRoute(
                 path: profile,
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: TempScreen(title: 'Profile')),
+                    const NoTransitionPage(child: ProfilePage()),
               ),
             ],
           ),
