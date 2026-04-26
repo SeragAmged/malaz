@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:go_router/go_router.dart';
+import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:malaz/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:malaz/features/auth/presentation/cubit/auth_cubit.dart';
@@ -140,7 +141,8 @@ class AppRouter {
                       return RoomPage(
                         roomId: state.pathParameters['id']!,
                         roomName: extra['name'] ?? 'ZENGARDERN',
-                        roomColor: extra['color'] as Color? ?? Colors.blueGrey,
+                        roomColor:
+                            extra['color'] as Color? ?? AppColors.primaryColor,
                       );
                     },
                   ),

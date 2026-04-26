@@ -77,7 +77,7 @@ class TimerCard extends StatelessWidget {
                 ? AppColors.warningColor
                 : isIdle
                 ? color
-                : AppColors.secondaryColor,
+                : AppColors.primaryColor,
           ),
           SizedBox(height: 16.h),
           Row(
