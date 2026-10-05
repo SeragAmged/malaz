@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
-import 'package:malaz/core/theme/extensions.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
 import 'package:malaz/features/rooms/presentation/cubit/timer/timer_state.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/rolling_timer_text.dart';
-import 'package:malaz/features/rooms/presentation/pages/room_page.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/outlined_action_button.dart';
 
 class TimerCard extends StatelessWidget {

@@ -1,6 +1,5 @@
 import 'package:injectable/injectable.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
-import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 
 import '../../../../core/util/errors/domain_errors.dart';
 import '../../../../core/util/result.dart';

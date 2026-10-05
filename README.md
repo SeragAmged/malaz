@@ -2,6 +2,29 @@
 
 A modern Flutter app featuring a complete authentication system implemented with Material 3 design language, Supabase backend, and clean architecture.
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/login.png" width="200" alt="Login"><br><sub>Login</sub></td>
+    <td align="center"><img src="docs/screenshots/signup.png" width="200" alt="Sign up"><br><sub>Sign up</sub></td>
+    <td align="center"><img src="docs/screenshots/reset-password.png" width="200" alt="Reset password"><br><sub>Reset password</sub></td>
+    <td align="center"><img src="docs/screenshots/rooms.png" width="200" alt="Rooms"><br><sub>Rooms</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/create-room.png" width="200" alt="Create room"><br><sub>Create room</sub></td>
+    <td align="center"><img src="docs/screenshots/add-type.png" width="200" alt="Custom room type"><br><sub>Custom room type</sub></td>
+    <td align="center"><img src="docs/screenshots/room-focus.png" width="200" alt="Focus session"><br><sub>Focus session</sub></td>
+    <td align="center"><img src="docs/screenshots/room-break.png" width="200" alt="Break time"><br><sub>Break time</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/focus-duration.png" width="200" alt="Focus duration"><br><sub>Focus duration</sub></td>
+    <td align="center"><img src="docs/screenshots/break-duration.png" width="200" alt="Break duration"><br><sub>Break duration</sub></td>
+    <td align="center"><img src="docs/screenshots/statistics.png" width="200" alt="Statistics"><br><sub>Statistics</sub></td>
+    <td align="center"><img src="docs/screenshots/profile.png" width="200" alt="Profile"><br><sub>Profile</sub></td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 ### Authentication

@@ -5,7 +5,6 @@ import 'package:malaz/core/theme/app_text_styles.dart';
 import 'package:malaz/core/theme/extensions.dart';
 import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/rolling_timer_text.dart';
-import 'package:malaz/features/rooms/presentation/pages/room_page.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/session_slider.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/outlined_action_button.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

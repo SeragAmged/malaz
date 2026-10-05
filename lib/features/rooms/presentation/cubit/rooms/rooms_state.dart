@@ -18,7 +18,9 @@ class RoomsState {
     this.leaveRoomStatus = UiStatus.initial,
     this.leaveRoomError,
     this.joinStatus = UiStatus.initial,
-    this.joinError, this.joinedRoomId,
+    this.joinError,
+    this.joinedRoomId,
+    this.totalUsersCount,
   });
 
   final UiStatus status;
@@ -35,6 +37,7 @@ class RoomsState {
   final UiStatus joinStatus;
   final DomainError? joinError;
   final String? joinedRoomId;
+  final int? totalUsersCount;
 
   bool get isInitial => status == UiStatus.initial;
   bool get isLoading => status == UiStatus.loading;
@@ -70,8 +73,10 @@ class RoomsState {
     bool clearLeaveRoomError = false,
     bool clearJoinError = false,
     String? joinedRoomId,
+    int? totalUsersCount,
   }) {
     return RoomsState(
+      totalUsersCount: totalUsersCount ?? this.totalUsersCount,
       newRoomId: newRoomId ?? this.newRoomId,
       status: status ?? this.status,
       rooms: rooms ?? this.rooms,
@@ -81,7 +86,9 @@ class RoomsState {
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       createStatus: createStatus ?? this.createStatus,
       createError: clearCreateError ? null : (createError ?? this.createError),
-      leaveRoomError: clearLeaveRoomError ? null : (leaveRoomError ?? this.leaveRoomError),
+      leaveRoomError: clearLeaveRoomError
+          ? null
+          : (leaveRoomError ?? this.leaveRoomError),
       leaveRoomStatus: leaveRoomStatus ?? this.leaveRoomStatus,
       joinStatus: joinStatus ?? this.joinStatus,
       joinError: clearJoinError ? null : (joinError ?? this.joinError),

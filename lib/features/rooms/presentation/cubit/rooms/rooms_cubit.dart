@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:malaz/core/di/providers.dart';
 import 'package:malaz/features/rooms/domain/entities/room.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../domain/repositories/rooms_repository.dart';
 import 'rooms_state.dart';
 
@@ -235,7 +237,28 @@ class RoomsCubit extends Cubit<RoomsState> {
         clearCreateError: true,
         clearLeaveRoomError: true,
         clearJoinError: true,
+        totalUsersCount: null,
       ),
     );
   }
+
+  void getTotalUsersCount() async {
+    final supabaseClient = getIt<SupabaseClient>();
+    supabaseClient
+        .from("totalusers")
+        .select('*')
+        .single()
+        .then((response) {
+          final count = response['count'] as int?;
+          emit(state.copyWith(totalUsersCount: count));
+        })
+        .catchError((error) {
+          emit(state.copyWith(errorMessage: error.toString()));
+        });
+  }
+
+  void resetTotalUsersCount() {
+    emit(state.copyWith(totalUsersCount: null));
+  }
+  
 }

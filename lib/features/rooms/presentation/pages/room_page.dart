@@ -5,10 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:malaz/core/di/providers.dart';
 import 'package:malaz/core/theme/app_colors.dart';
 import 'package:malaz/core/theme/app_text_styles.dart';
-import 'package:malaz/core/theme/extensions.dart';
-import 'package:malaz/core/widgets/app_loading_button.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
-import 'package:malaz/features/rooms/domain/entities/leaderboard_entry.dart';
 import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 import 'package:malaz/features/rooms/presentation/cubit/timer/timer_cubit.dart';
 import 'package:malaz/features/rooms/presentation/cubit/timer/timer_state.dart';
@@ -18,13 +15,8 @@ import 'package:malaz/features/rooms/presentation/widgets/room/active_residents_
 import 'package:malaz/features/rooms/presentation/widgets/room/avatar_with_status.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/edit_card_body.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/leaderboard_card.dart';
-import 'package:malaz/features/rooms/presentation/widgets/room/rolling_digit.dart';
-import 'package:malaz/features/rooms/presentation/widgets/room/rolling_timer_text.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/timer_card.dart';
-import 'package:malaz/features/rooms/presentation/widgets/room/outlined_action_button.dart';
 import 'package:malaz/features/rooms/presentation/widgets/room/room_timer_card_shell.dart';
-import 'package:malaz/features/rooms/presentation/widgets/rooms/rooms_card_avatar.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class RoomPage extends StatefulWidget {
   const RoomPage({

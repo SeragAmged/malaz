@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,9 @@ class RoomsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<RoomsCubit>(
-      create: (context) => getIt<RoomsCubit>()..fetchRooms(),
+      create: (context) => getIt<RoomsCubit>()
+        ..fetchRooms()
+        ..getTotalUsersCount(),
       child: const _RoomsView(),
     );
   }
@@ -106,13 +109,13 @@ class _RoomsViewState extends State<_RoomsView> {
                   );
                   context.go(
                     '${AppRouter.rooms}/${state.joinedRoomId}',
-                    
+
                     extra: {
                       'name': joinedRoom.name,
                       'color': joinedRoom.color.toColor,
                     },
-                    );
-                  }
+                  );
+                }
                 if (state.isJoinFailure) {
                   if (state.joinError is AlreadyInRoom) {
                     showDialog(
@@ -142,6 +145,22 @@ class _RoomsViewState extends State<_RoomsView> {
                 }
               },
               builder: (context, state) {
+                if (state.totalUsersCount != null) {
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Total Users count  is ${state.totalUsersCount}",
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.onErrorColor,
+                          ),
+                        ),
+                        backgroundColor: AppColors.primaryColor,
+                      ),
+                    );
+                    context.read<RoomsCubit>().resetTotalUsersCount();
+                  });
+                }
                 if (state.isLoading || state.isInitial) {
                   return const Center(
                     child: CircularProgressIndicator(

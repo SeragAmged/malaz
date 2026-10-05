@@ -1,6 +1,5 @@
 import 'package:injectable/injectable.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
-import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 @injectable

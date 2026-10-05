@@ -2,9 +2,6 @@ import 'dart:developer';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:flutter/foundation.dart';
-import '../models/leaderboard_entry_model.dart';
-import '../models/room_member_with_session_model.dart';
 import '../models/room_model.dart';
 
 @injectable

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:malaz/features/rooms/domain/entities/enums.dart';
-import 'package:malaz/features/rooms/domain/entities/room_member_with_session.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:malaz/core/util/errors/domain_errors.dart';
 import 'package:malaz/core/util/result.dart';
